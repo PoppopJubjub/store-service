@@ -9,7 +9,6 @@ import com.popjub.store_service.domain.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
-//
 @RequiredArgsConstructor
 @Repository
 public class CategoryRepositoryImpl implements CategoryRepository {
