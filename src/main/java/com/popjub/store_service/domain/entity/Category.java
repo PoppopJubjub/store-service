@@ -22,7 +22,7 @@ public class Category extends BaseEntity {
 	private String name;
 
 	// 생성자: 엔티티 내부에서만 사용
-	public Category(String name) {
+	private Category(String name) {
 		this.name = name;
 	}
 
