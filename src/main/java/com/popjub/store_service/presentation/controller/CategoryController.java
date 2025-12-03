@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.response.ApiResponse;
+import com.popjub.store_service.application.dto.command.CreateCategoryCommand;
+import com.popjub.store_service.application.dto.result.CreateCategoryResult;
 import com.popjub.store_service.application.service.CategoryService;
 import com.popjub.store_service.presentation.dto.request.CreateCategoryRequest;
 import com.popjub.store_service.presentation.dto.response.CreateCategoryResponse;
@@ -25,7 +27,10 @@ public class CategoryController {
 	@PostMapping
 	public ApiResponse<CreateCategoryResponse> createCategory(
 		@Valid @RequestBody CreateCategoryRequest request){
-		CreateCategoryResponse response = categoryService.createCategory(request);
+		//req -> command
+		CreateCategoryCommand command = request.toCommand();
+		CreateCategoryResult result = categoryService.createCategory(command);
+		CreateCategoryResponse response = CreateCategoryResponse.from(result);
 		return ApiResponse.of(SuccessCode.CREATED,response);
 
 
