@@ -3,7 +3,6 @@ package com.popjub.store_service.presentation.dto.request;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
@@ -13,8 +12,11 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateStoreRequest(
+
+	//image
+
 	@NotNull(message = "스토어 매니저 ID는 필수입니다.")
-	UUID storeManagerId,
+	Long storeManagerId,
 
 	@NotBlank(message = "스토어 이름은 필수입니다.")
 	String storeName,

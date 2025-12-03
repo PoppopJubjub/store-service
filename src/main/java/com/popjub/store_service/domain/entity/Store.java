@@ -23,7 +23,7 @@ public class Store extends BaseEntity {
 	private UUID storeId;
 
 	@Column(name = "store_manager_id", nullable = false)
-	private UUID storeManagerId;
+	private Long storeManagerId;
 
 	@Column(name = "store_name", nullable = false, length = 100)
 	private String name;
@@ -61,7 +61,7 @@ public class Store extends BaseEntity {
 
 	/* ================== 공통 private 생성자 ================== */
 	@Builder
-	private Store(UUID storeManagerId,
+	private Store(Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
@@ -91,7 +91,7 @@ public class Store extends BaseEntity {
 	/* ================== 생성자 2개(유료/무료) ================== */
 
 	// 무료 스토어 생성
-	public static Store createFreeStore(UUID storeManagerId,
+	public static Store createFreeStore(Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
@@ -113,7 +113,7 @@ public class Store extends BaseEntity {
 	}
 
 	// 유료 스토어 생성
-	public static Store createPaidStore(UUID storeManagerId,
+	public static Store createPaidStore(Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
