@@ -1,22 +1,14 @@
 package com.popjub.store_service.domain.entity;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.popjub.common.entity.BaseEntity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,9 +16,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_store_time")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_store_time SET deleted_at = NOW(), deleted_by = ? WHERE store_time_id = ?")
-@Where(clause = "deleted_at IS NULL")
-public class StoreTime /*extends BaseEntity*/{
+
+public class StoreTime  extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -36,59 +27,71 @@ public class StoreTime /*extends BaseEntity*/{
 	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
 
-	@Column(name = "day_of_week", nullable = false, length = 4)
-	private String dayOfWeek;  // "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"
+	@Column(nullable = false)
+	private LocalDate date;
 
-	// ✅ TIME 타입 → LocalTime으로 매핑
+	/**
+	 * 요일은 java.time.DayOfWeek 로 관리
+	 * DB 컬럼은 ENUM STRING 으로 "MONDAY", "TUESDAY" 형태로 저장됨
+	 */
+	@Enumerated(EnumType.STRING)
+	@Column(name = "day_of_week", nullable = false, length = 9)
+	private DayOfWeek dayOfWeek;
+
 	@Column(name = "start_time", nullable = false)
 	private LocalTime startTime;
 
-	// ✅ TIME 타입 → LocalTime으로 매핑
 	@Column(name = "end_time", nullable = false)
 	private LocalTime endTime;
 
-	/* ================== 생성자 ================== */
+	/* ================== private 생성자 ================== */
 
-	public StoreTime(Store store, String dayOfWeek, LocalTime startTime, LocalTime endTime) {
+	@Builder
+	private StoreTime(Store store,
+		LocalDate date,
+		DayOfWeek dayOfWeek,
+		LocalTime startTime,
+		LocalTime endTime) {
 		this.store = store;
+		this.date = date;
 		this.dayOfWeek = dayOfWeek;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		validate();
+	}
+
+	/* ================== 정적 팩토리 메서드 ================== */
+
+	/**
+	 * LocalDate로만 받아서 내부에서 요일 계산하는 버전
+	 * (운영기간 + 운영시간 조합해서 생성할 때 사용)
+	 */
+	public static StoreTime of(
+		Store store,
+		LocalDate date,
+		LocalTime startTime,
+		LocalTime endTime) {
+
+		return StoreTime.builder()
+			.store(store)
+			.date(date)
+			.dayOfWeek(date.getDayOfWeek())
+			.startTime(startTime)
+			.endTime(endTime)
+			.build();
 	}
 
 	/* ================== 도메인 메서드 ================== */
 
-	public void updateOperatingTime(String dayOfWeek, LocalTime startTime, LocalTime endTime) {
-		this.dayOfWeek = dayOfWeek;
+	/**
+	 * 운영 시간/날짜 수정 (요일은 date 기준으로 재계산)
+	 */
+	public void updateOperatingTime(LocalDate date,
+		LocalTime startTime,
+		LocalTime endTime) {
+
+		this.date = date;
+		this.dayOfWeek = date.getDayOfWeek();
 		this.startTime = startTime;
 		this.endTime = endTime;
-		validate();
 	}
-
-	/* ================== 검증 ================== */
-
-	private void validate() {
-		validateDayOfWeek();
-		validateTimeRange();
-	}
-
-	private void validateDayOfWeek() {
-		List<String> validDays = List.of("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN");
-		if (!validDays.contains(dayOfWeek)) {
-			throw new IllegalArgumentException("유효하지 않은 요일입니다");
-		}
-	}
-
-	private void validateTimeRange() {
-		// ✅ LocalTime.isBefore() 사용 가능
-		if (endTime.isBefore(startTime)) {
-			throw new IllegalStateException("종료 시간은 시작 시간보다 빠를 수 없습니다.");
-		}
-
-		if (endTime.equals(startTime)) {
-			throw new IllegalStateException("시작 시간과 종료 시간이 같을 수 없습니다.");
-		}
-	}
-
 }
