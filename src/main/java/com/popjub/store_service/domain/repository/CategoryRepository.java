@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.popjub.store_service.domain.entity.Category;
 
-//JPA 말고 다른 ORM이 들어 왔을 때 서비스 코드가 변경되지 않기 위해 Repository분리
-//의존성 역전
 public interface CategoryRepository{
 	boolean existsByName(String name);
 	List<Category> findAllById(List<Long> categoryIds);
