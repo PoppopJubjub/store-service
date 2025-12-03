@@ -1,6 +1,13 @@
 package com.popjub.store_service.domain.entity;
 
-import jakarta.persistence.*;
+import com.popjub.common.entity.BaseEntity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_category")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category /*extends BaseEntity*/{
+public class Category extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,33 +25,18 @@ public class Category /*extends BaseEntity*/{
 	@Column(name = "category_name", nullable = false, length = 50, unique = true)
 	private String name;
 
-	public Category(String name) {
+	// 생성자: 엔티티 내부에서만 사용
+	private Category(String name) {
 		this.name = name;
 	}
 
+	// 정적 팩토리 메서드
+	public static Category of(String name) {
+		return new Category(name);
+	}
+
+	// 엔티티 수정 메서드 (검증은 DTO/서비스에서)
 	public void updateName(String newName) {
-		validateName(newName);
 		this.name = newName;
-	}
-
-	/* ================== 검증 ================== */
-
-	@PrePersist
-	@PreUpdate // DB 저장/수정 전에 검증
-	private void validateBeforeSave() {
-		validate();
-	}
-
-	private void validate() {
-		validateName(this.name);
-	}
-
-	private void validateName(String name) {
-		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("카테고리 이름은 Null 일 수 없습니다.");
-		}
-		if (name.length() > 50) {
-			throw new IllegalArgumentException("카테고리 이름은 최대 50자입니다.");
-		}
 	}
 }
