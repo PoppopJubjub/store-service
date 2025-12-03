@@ -1,5 +1,7 @@
 package com.popjub.store_service.infrastructure.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.popjub.store_service.domain.entity.StoreCategory;
@@ -13,7 +15,7 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
 	private final StoreCategoryJpaRepository storeCategoryJpaRepository;
 
 	@Override
-	public void saveAll(Iterable<StoreCategory> storeCategories) {
+	public void saveAll(List <StoreCategory> storeCategories) {
 		 storeCategoryJpaRepository.saveAll(storeCategories);
 	}
 }
