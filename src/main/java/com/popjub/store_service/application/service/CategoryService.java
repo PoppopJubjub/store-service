@@ -18,9 +18,9 @@ public class CategoryService {
 	private final CategoryRepository categoryRepository;
 
 	@Transactional
-	// todo customException처리
+	// todo : customException처리
 	public CreateCategoryResult createCategory(CreateCategoryCommand command) {
-		//todo Admin Role만 가능하게 처리
+		//todo : Admin Role만 가능하게 처리
 
 		if (categoryRepository.existsByName(command.categoryName())) {
 			throw new IllegalArgumentException("이미 존재하는 카테고리입니다.");

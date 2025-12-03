@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_store_category")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// @SQLDelete(sql = "UPDATE p_store_category SET deleted_at = NOW(), deleted_by = ? WHERE store_category_id = ?")
-// @Where(clause = "deleted_at IS NULL")
-public class StoreCategory /* extends BaseEntity */ {
+public class StoreCategory  extends BaseEntity  {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

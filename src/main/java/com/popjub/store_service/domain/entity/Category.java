@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_category")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//todo
 public class Category extends BaseEntity {
 
 	@Id
