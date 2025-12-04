@@ -39,7 +39,7 @@ public class TimeSlotService {
 			.findByStoreAndDate(store, command.date())
 			.orElseThrow(() -> new IllegalArgumentException("해당 날짜의 운영시간이 없습니다."));
 
-		timeSlotValidator.validate(command, storeTime);
+		timeSlotValidator.validate(storeTime);
 		List<TimeSlot> timeSlots = command.createTimeslots(store, storeTime);
 		List<TimeSlot> savedTimeSlots = timeslotRepository.saveAll(timeSlots);
 		return CreateTimeSlotResult.from(savedTimeSlots);
