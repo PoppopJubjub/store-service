@@ -13,12 +13,12 @@ public record CreateStoreCommand(
 	BigDecimal longitude,
 	LocalDate startDate,
 	LocalDate endDate,
-	Boolean isFree,
-	Integer price
+	Integer price // null이면 무료, >=1이면 유료
 ) {
-	//price로 무료/유료 판단은 어떤지?
-	public Store toEntity(){
-		if(isFree){
+
+	public Store toEntity() {
+		if (price == null) {
+			// 무료 스토어
 			return Store.createFreeStore(
 				storeManagerId,
 				storeName,
@@ -29,6 +29,8 @@ public record CreateStoreCommand(
 				endDate
 			);
 		}
+
+		// 유료 스토어
 		return Store.createPaidStore(
 			storeManagerId,
 			storeName,

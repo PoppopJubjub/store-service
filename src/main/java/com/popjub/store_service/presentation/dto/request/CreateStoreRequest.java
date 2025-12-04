@@ -58,7 +58,6 @@ public record CreateStoreRequest(
 			longitude,
 			startDate,
 			endDate,
-			isFree,
 			price
 		);
 	}
