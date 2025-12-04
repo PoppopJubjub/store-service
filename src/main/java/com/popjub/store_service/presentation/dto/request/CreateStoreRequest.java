@@ -36,10 +36,6 @@ public record CreateStoreRequest(
 	@NotNull(message = "운영 종료일은 필수입니다.")
 	LocalDate endDate,
 
-	@NotNull(message = "무료/유료 여부는 필수입니다.")
-	Boolean isFree,
-
-
 	Integer price,
 
 	@NotEmpty(message = "운영 규칙(timeRules)은 필수입니다.")
