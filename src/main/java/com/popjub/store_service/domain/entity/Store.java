@@ -59,6 +59,9 @@ public class Store extends BaseEntity {
 	@Column(name = "price")
 	private Integer price;
 
+	@Column(name = "image_url", length = 500, nullable = true)
+	private String imageUrl;
+
 	/* ================== 공통 private 생성자 ================== */
 	@Builder
 	private Store(Long storeManagerId,
@@ -157,5 +160,9 @@ public class Store extends BaseEntity {
 	public void updatePricing(Boolean isFree, Integer price) {
 		this.isFree = isFree;
 		this.price = Boolean.TRUE.equals(isFree) ? null : price;
+	}
+
+	public void updateImage(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 }
