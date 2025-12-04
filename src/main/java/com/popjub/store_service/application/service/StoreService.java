@@ -38,7 +38,7 @@ public class StoreService {
 		List<CreateTimeRuleCommand> timeRuleCommands,
 		List<Long> categoryIds)
 	{
-		storeValidator.validateCreateStore(storeCommand, timeRuleCommands);
+		storeValidator.validateCreateStore(storeCommand, timeRuleCommands,categoryIds);
 
 		Store store = storeRepository.save(storeCommand.toEntity());
 
@@ -61,15 +61,8 @@ public class StoreService {
 		return CreateStoreResult.from(store);
 	}
 
-	// ================== 카테고리 검증 + 매핑 생성 ==================
-	// todo : customException처리
 	private List<StoreCategory> buildStoreCategories(Store store, List<Long> categoryIds) {
 		List<Category> categories = categoryRepository.findAllById(categoryIds);
-
-		if (categories.size() != categoryIds.size()) {
-			throw new IllegalArgumentException("존재하지 않는 카테고리 ID가 포함되어 있습니다.");
-		}
-
 		List<StoreCategory> result = new ArrayList<>();
 		for (Category category : categories) {
 			result.add(StoreCategory.of(store, category));

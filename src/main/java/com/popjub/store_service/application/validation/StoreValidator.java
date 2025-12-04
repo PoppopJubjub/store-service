@@ -11,22 +11,40 @@ import org.springframework.stereotype.Component;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.store_service.domain.entity.Category;
+import com.popjub.store_service.domain.repository.CategoryRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class StoreValidator {
 
+	private final CategoryRepository categoryRepository;
+
+	//todo : CustomException 적용
 	public void validateCreateStore(
 		CreateStoreCommand storeCommand,
-		List<CreateTimeRuleCommand> timeRuleCommands
+		List<CreateTimeRuleCommand> timeRuleCommands,
+		List<Long> categoryIds
 	) {
 		validateLocation(storeCommand.latitude(), storeCommand.longitude());
 		validatePeriod(storeCommand.startDate(), storeCommand.endDate());
-		validatePricePolicy(storeCommand.isFree(), storeCommand.price());
+		validatePricePolicy(storeCommand.price());
 		validateAllDayCovered(timeRuleCommands);
+		validateCategory(categoryIds);
 	}
 
 	// ================== 내부 검증 메서드들 ==================
 
+	private void validateCategory(List<Long> categoryIds){
+		List<Category> categories = categoryRepository.findAllById(categoryIds);
+
+		if (categories.size() != categoryIds.size()) {
+			throw new IllegalArgumentException("존재하지 않는 카테고리 ID가 포함되어 있습니다.");
+		}
+
+	}
 	private void validateLocation(BigDecimal latitude, BigDecimal longitude) {
 		if (latitude.compareTo(BigDecimal.valueOf(-90)) < 0 ||
 			latitude.compareTo(BigDecimal.valueOf(90)) > 0) {
@@ -45,15 +63,12 @@ public class StoreValidator {
 		}
 	}
 
-	// validation 을 안쓰고 price로 무료/유료 판단
-	private void validatePricePolicy(Boolean isFree, Integer price) {
-		// 무료 스토어인데 price가 설정된 경우
-		if (Boolean.TRUE.equals(isFree) && price != null) {
-			throw new IllegalArgumentException("무료 스토어는 가격을 설정할 수 없습니다.");
+	private void validatePricePolicy(Integer price) {
+		if (price == null) {
+			return;
 		}
 
-		// 유료 스토어인데 price가 없거나 음수인 경우
-		if (!Boolean.TRUE.equals(isFree) && (price == null || price < 1)) {
+		if (price < 1) {
 			throw new IllegalArgumentException("유료 스토어는 1 이상 가격이 필요합니다.");
 		}
 	}
