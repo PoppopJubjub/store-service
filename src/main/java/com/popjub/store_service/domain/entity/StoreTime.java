@@ -46,7 +46,7 @@ public class StoreTime  extends BaseEntity {
 
 	/* ================== private 생성자 ================== */
 
-	@Builder
+	@Builder(access = AccessLevel.PRIVATE)
 	private StoreTime(Store store,
 		LocalDate date,
 		DayOfWeek dayOfWeek,

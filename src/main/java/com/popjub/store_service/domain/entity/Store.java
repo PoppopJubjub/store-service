@@ -63,7 +63,7 @@ public class Store extends BaseEntity {
 	private String imageUrl;
 
 	/* ================== 공통 private 생성자 ================== */
-	@Builder
+	@Builder(access = AccessLevel.PRIVATE)
 	private Store(Long storeManagerId,
 		String name,
 		String address,
