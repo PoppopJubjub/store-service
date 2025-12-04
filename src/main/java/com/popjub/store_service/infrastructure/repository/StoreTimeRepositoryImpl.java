@@ -1,6 +1,7 @@
 package com.popjub.store_service.infrastructure.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -24,7 +25,7 @@ public class StoreTimeRepositoryImpl implements StoreTimeRepository {
 	}
 
 	@Override
-	public void saveAll(Iterable<StoreTime> storeTimes) {
+	public void saveAll(List<StoreTime> storeTimes) {
 		storeTimeJpaRepository.saveAll(storeTimes);
 	}
 }
