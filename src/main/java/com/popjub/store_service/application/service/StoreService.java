@@ -42,7 +42,6 @@ public class StoreService {
 
 		Store store = storeRepository.save(storeCommand.toEntity());
 
-		// 4) 운영시간 생성 및 저장
 		List<StoreTime> storeTimes =
 			timeRuleCommands.stream()
 				.flatMap(rule -> rule.createStoreTimes(
@@ -53,11 +52,9 @@ public class StoreService {
 				.toList();
 		storeTimeRepository.saveAll(storeTimes);
 
-		// 5) 카테고리 매핑 생성 및 저장
 		List<StoreCategory> storeCategories = buildStoreCategories(store, categoryIds);
 		storeCategoryRepository.saveAll(storeCategories);
 
-		// 6) storeId만 반환
 		return CreateStoreResult.from(store);
 	}
 
