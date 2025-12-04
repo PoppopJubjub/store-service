@@ -4,8 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import com.popjub.common.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,9 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_store")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE p_store SET deleted_at = NOW(), deleted_by = ? WHERE store_id = ?")
-@Where(clause = "deleted_at IS NULL")
-public class Store /*extends BaseEntity*/ {
+public class Store extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -48,13 +45,13 @@ public class Store /*extends BaseEntity*/ {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private StoreStatus status = StoreStatus.UPCOMING;
+	private StoreStatus status;
 
 	@Column(name = "rating_avg", nullable = false, precision = 2, scale = 1)
-	private BigDecimal ratingAvg = BigDecimal.ZERO;
+	private BigDecimal ratingAvg;
 
 	@Column(name = "total_review", nullable = false)
-	private Integer totalReview = 0;
+	private Integer totalReview;
 
 	@Column(name = "is_free", nullable = false)
 	private Boolean isFree;
@@ -62,11 +59,20 @@ public class Store /*extends BaseEntity*/ {
 	@Column(name = "price")
 	private Integer price;
 
-	// ✅ 변경: 양방향 매핑 제거 (timeslots 컬렉션 삭제)
+	@Column(name = "image_url", length = 500, nullable = true)
+	private String imageUrl;
 
-	@Builder
-	public Store(Long storeManagerId, String name, String address, BigDecimal latitude, BigDecimal longitude,
-		LocalDate startDate, LocalDate endDate, Boolean isFree, Integer price) {
+	/* ================== 공통 private 생성자 ================== */
+	@Builder(access = AccessLevel.PRIVATE)
+	private Store(Long storeManagerId,
+		String name,
+		String address,
+		BigDecimal latitude,
+		BigDecimal longitude,
+		LocalDate startDate,
+		LocalDate endDate,
+		Boolean isFree,
+		Integer price) {
 
 		this.storeManagerId = storeManagerId;
 		this.name = name;
@@ -75,51 +81,67 @@ public class Store /*extends BaseEntity*/ {
 		this.longitude = longitude;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		updatePricing(isFree, price);
+
+		this.isFree = isFree;
+		this.price = price;
+
+		// 기본값
+		this.status = StoreStatus.UPCOMING;
+		this.ratingAvg = BigDecimal.ZERO;
+		this.totalReview = 0;
 	}
 
-	/* ================== 도메인 검증 ================== */
+	/* ================== 생성자 2개(유료/무료) ================== */
 
-	@PrePersist
-	@PreUpdate
-	private void validateBeforeSave() {
-		validate();
+	// 무료 스토어 생성
+	public static Store createFreeStore(Long storeManagerId,
+		String name,
+		String address,
+		BigDecimal latitude,
+		BigDecimal longitude,
+		LocalDate startDate,
+		LocalDate endDate) {
+
+		return Store.builder()
+			.storeManagerId(storeManagerId)
+			.name(name)
+			.address(address)
+			.latitude(latitude)
+			.longitude(longitude)
+			.startDate(startDate)
+			.endDate(endDate)
+			.isFree(true)
+			.price(null)     // 무료 → 가격 없음
+			.build();
 	}
 
-	private void validate() {
-		validateLocation();
-		validatePeriod();
-		validatePrice();
-	}
+	// 유료 스토어 생성
+	public static Store createPaidStore(Long storeManagerId,
+		String name,
+		String address,
+		BigDecimal latitude,
+		BigDecimal longitude,
+		LocalDate startDate,
+		LocalDate endDate,
+		int price) {
 
-	private void validatePeriod() {
-		if (endDate.isBefore(startDate)) {
-			throw new IllegalArgumentException("운영 종료일은 시작일보다 빠를 수 없습니다.");
-		}
-	}
-
-	private void validateLocation() {
-		if (latitude.compareTo(BigDecimal.valueOf(-90)) < 0 || latitude.compareTo(BigDecimal.valueOf(90)) > 0) {
-			throw new IllegalArgumentException("위도는 -90 ~ 90 범위여야 합니다.");
-		}
-
-		if (longitude.compareTo(BigDecimal.valueOf(-180)) < 0 || longitude.compareTo(BigDecimal.valueOf(180)) > 0) {
-			throw new IllegalArgumentException("경도는 -180 ~ 180 범위여야 합니다.");
-		}
-	}
-
-	private void validatePrice() {
-		if (!Boolean.TRUE.equals(isFree) && (price == null || price < 0)) {
-			throw new IllegalArgumentException("유료 스토어는 0 이상 가격이 필요합니다.");
-		}
-		if (Boolean.TRUE.equals(isFree) && price != null) {
-			throw new IllegalArgumentException("무료 스토어는 가격을 설정할 수 없습니다.");
-		}
+		return Store.builder()
+			.storeManagerId(storeManagerId)
+			.name(name)
+			.address(address)
+			.latitude(latitude)
+			.longitude(longitude)
+			.startDate(startDate)
+			.endDate(endDate)
+			.isFree(false)
+			.price(price)
+			.build();
 	}
 
 	/* ================== 도메인 수정 메서드 ================== */
 
-	public void updateStoreInfo(String name, String address, BigDecimal latitude, BigDecimal longitude,
+	public void updateStoreInfo(String name, String address,
+		BigDecimal latitude, BigDecimal longitude,
 		LocalDate startDate, LocalDate endDate) {
 
 		this.name = name;
@@ -128,9 +150,6 @@ public class Store /*extends BaseEntity*/ {
 		this.longitude = longitude;
 		this.startDate = startDate;
 		this.endDate = endDate;
-
-		validateLocation();
-		validatePeriod();
 	}
 
 	public void updateReviewStats(BigDecimal newAvg, int newTotal) {
@@ -141,7 +160,9 @@ public class Store /*extends BaseEntity*/ {
 	public void updatePricing(Boolean isFree, Integer price) {
 		this.isFree = isFree;
 		this.price = Boolean.TRUE.equals(isFree) ? null : price;
-		validatePrice();
 	}
-	/* ================== 편의 메서드 ================== */
+
+	public void updateImage(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 }

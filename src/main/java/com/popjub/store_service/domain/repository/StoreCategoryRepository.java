@@ -1,10 +1,9 @@
 package com.popjub.store_service.domain.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
 import com.popjub.store_service.domain.entity.StoreCategory;
 
-@Repository
-public interface StoreCategoryRepository extends JpaRepository<StoreCategory, Long> {
+public interface StoreCategoryRepository{
+	void saveAll (List<StoreCategory> storeCategories);
 }
