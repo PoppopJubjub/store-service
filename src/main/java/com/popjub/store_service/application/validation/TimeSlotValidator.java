@@ -11,15 +11,8 @@ import com.popjub.store_service.domain.entity.StoreTime;
 public class TimeSlotValidator {
 
 	public void validate(CreateTimeSlotCommand command, StoreTime storeTime) {
-		validateInterval(command.intervalMinutes());
 		validateCapacity(command.capacity());
 		validateWithinOperatingTime(storeTime);
-	}
-
-	private void validateInterval(Integer intervalMinutes) {
-		if (intervalMinutes != 30 && intervalMinutes != 60) {
-			throw new IllegalArgumentException("interval은 30 또는 60만 허용됩니다.");
-		}
 	}
 
 	private void validateCapacity(Integer capacity) {
