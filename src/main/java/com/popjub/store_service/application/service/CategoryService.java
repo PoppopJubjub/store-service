@@ -49,6 +49,7 @@ public class CategoryService {
 	}
 
 	@Transactional
+	//todo : 관리자용
 	public UpdateCategoryResult updateCategory(Long CategoryId, UpdateCategoryCommand command) {
 		Category category = categoryRepository.findById(CategoryId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
