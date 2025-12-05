@@ -21,6 +21,7 @@ public enum StoreErrorCode implements BaseErrorCode {
 	INVALID_CATEGORY_IDS("존재하지 않는 카테고리 ID가 포함되어 있습니다.",HttpStatus.BAD_REQUEST),
 	ALREADY_EXISTS_CATEGORY("이미 존재하는 카테고리입니다." ,  HttpStatus.BAD_REQUEST),
 	NOT_FOUND_STORE("스토어를 찾을 수 없습니다.",  HttpStatus.NOT_FOUND),
+	NOT_FOUND_CATEGORY("카테고리를 찾을 수 없습니다." , HttpStatus.NOT_FOUND),
 	NOT_FOUND_STORE_TIME("운영시간을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	/**
 	 * 타임룰/타임슬롯 관련 검증 에러

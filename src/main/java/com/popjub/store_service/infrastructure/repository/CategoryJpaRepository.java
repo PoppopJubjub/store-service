@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.popjub.store_service.domain.entity.Category;
 
-public interface CategoryJpaRepository extends JpaRepository<Category,Long> {
+public interface CategoryJpaRepository extends JpaRepository<Category, Long> {
 
-	boolean existsByName(String name);
+	// 카테고리 이름 중복 체크
+	boolean existsByCategoryName(String categoryName);
+
 }

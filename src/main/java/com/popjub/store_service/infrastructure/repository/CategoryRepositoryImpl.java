@@ -1,7 +1,10 @@
 package com.popjub.store_service.infrastructure.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.popjub.store_service.domain.entity.Category;
@@ -12,11 +15,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Repository
 public class CategoryRepositoryImpl implements CategoryRepository {
+
 	private final CategoryJpaRepository categoryJpaRepository;
 
 	@Override
-	public boolean existsByName(String name) {
-		return categoryJpaRepository.existsByName(name);
+	public boolean existsByName(String categoryName) {
+		return categoryJpaRepository.existsByCategoryName(categoryName);
 	}
 
 	@Override
@@ -27,5 +31,15 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 	@Override
 	public Category save(Category category) {
 		return categoryJpaRepository.save(category);
+	}
+
+	@Override
+	public Optional<Category> findById(Long categoryId) {
+		return categoryJpaRepository.findById(categoryId);
+	}
+
+	@Override
+	public Page<Category> findAll(Pageable pageable) {
+		return categoryJpaRepository.findAll(pageable);
 	}
 }
