@@ -15,6 +15,8 @@ import com.popjub.store_service.domain.entity.TimeSlot;
 import com.popjub.store_service.domain.repository.StoreRepository;
 import com.popjub.store_service.domain.repository.StoreTimeRepository;
 import com.popjub.store_service.domain.repository.TimeslotRepository;
+import com.popjub.store_service.exception.StoreCustomException;
+import com.popjub.store_service.exception.StoreErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,16 +30,15 @@ public class TimeSlotService {
 	private final StoreRepository storeRepository;
 	private final TimeSlotValidator timeSlotValidator;
 
-	// todo customException처리
 	@Transactional
 	public CreateTimeSlotResult createTimeslots(UUID storeId, CreateTimeSlotCommand command) {
 
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스토어입니다."));
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
 		StoreTime storeTime = storeTimeRepository
 			.findByStoreAndDate(store, command.date())
-			.orElseThrow(() -> new IllegalArgumentException("해당 날짜의 운영시간이 없습니다."));
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
 
 		timeSlotValidator.validate(storeTime);
 		List<TimeSlot> timeSlots = command.createTimeslots(store, storeTime);
