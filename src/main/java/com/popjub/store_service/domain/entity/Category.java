@@ -31,8 +31,8 @@ public class Category extends BaseEntity {
 	}
 
 	// 정적 팩토리 메서드
-	public static Category of(String name) {
-		return new Category(name);
+	public static Category of(String categoryName) {
+		return new Category(categoryName);
 	}
 
 	// 엔티티 수정 메서드 (검증은 DTO/서비스에서)
