@@ -25,6 +25,11 @@ public class StoreTimeRepositoryImpl implements StoreTimeRepository {
 	}
 
 	@Override
+	public List<StoreTime> findAllByStore(Store store) {
+		return storeTimeJpaRepository.findAllByStore(store);
+	}
+
+	@Override
 	public void saveAll(List<StoreTime> storeTimes) {
 		storeTimeJpaRepository.saveAll(storeTimes);
 	}
