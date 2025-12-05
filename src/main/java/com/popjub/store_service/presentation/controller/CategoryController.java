@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,12 +16,16 @@ import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.response.ApiResponse;
 import com.popjub.common.response.PageResponse;
 import com.popjub.store_service.application.dto.command.CreateCategoryCommand;
+import com.popjub.store_service.application.dto.command.UpdateCategoryCommand;
 import com.popjub.store_service.application.dto.result.CreateCategoryResult;
 import com.popjub.store_service.application.dto.result.SearchCategoryResult;
+import com.popjub.store_service.application.dto.result.UpdateCategoryResult;
 import com.popjub.store_service.application.service.CategoryService;
 import com.popjub.store_service.presentation.dto.request.CreateCategoryRequest;
+import com.popjub.store_service.presentation.dto.request.UpdateCategoryRequest;
 import com.popjub.store_service.presentation.dto.response.CreateCategoryResponse;
 import com.popjub.store_service.presentation.dto.response.SearchCategoryResponse;
+import com.popjub.store_service.presentation.dto.response.UpdateCategoryResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +67,17 @@ public class CategoryController {
 	){
 		SearchCategoryResult result = categoryService.searchCategoryDetail(categoryId);
 		SearchCategoryResponse response = SearchCategoryResponse.from(result);
+		return ApiResponse.of(SuccessCode.OK, response);
+	}
+
+	@PutMapping("/{categoryId}")
+	public ApiResponse<UpdateCategoryResponse> updateCategory(
+		@PathVariable Long categoryId,
+		@RequestBody @Valid UpdateCategoryRequest request
+	) {
+		UpdateCategoryCommand command = request.toCommand();
+		UpdateCategoryResult result = categoryService.updateCategory(categoryId, command);
+		UpdateCategoryResponse response = UpdateCategoryResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 }
