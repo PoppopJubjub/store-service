@@ -23,11 +23,11 @@ public class Category extends BaseEntity {
 	private Long categoryId;
 
 	@Column(name = "category_name", nullable = false, length = 50, unique = true)
-	private String name;
+	private String categoryName;
 
 	// 생성자: 엔티티 내부에서만 사용
-	private Category(String name) {
-		this.name = name;
+	private Category(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	// 정적 팩토리 메서드
@@ -36,7 +36,7 @@ public class Category extends BaseEntity {
 	}
 
 	// 엔티티 수정 메서드 (검증은 DTO/서비스에서)
-	public void updateName(String newName) {
-		this.name = newName;
+	public void updateCategoryName(String newName) {
+		this.categoryName = newName;
 	}
 }
