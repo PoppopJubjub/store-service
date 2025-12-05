@@ -1,21 +1,42 @@
 package com.popjub.store_service.infrastructure.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.popjub.store_service.domain.entity.TimeSlot;
-import com.popjub.store_service.domain.repository.TimeslotRepository;
+import com.popjub.store_service.domain.repository.TimeSlotRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
-public class TimeSlotRepositoryImpl implements TimeslotRepository {
+public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 	private final TimeSlotJpaRepository timeSlotJpaRepository;
 
 	@Override
 	public List<TimeSlot> saveAll(List<TimeSlot> timeslots) {
 		return timeSlotJpaRepository.saveAll(timeslots);
 	}
+
+	@Override
+	public Optional<TimeSlot> findById(UUID timeSlotId) {
+		return timeSlotJpaRepository.findById(timeSlotId);
+	}
+
+	@Override
+	public Page<TimeSlot> findAll(Pageable pageable) {
+		return timeSlotJpaRepository.findAll(pageable);
+	}
+
+	@Override
+	public Page<TimeSlot> findAllByStore_StoreIdAndDate(UUID storeId, LocalDate date, Pageable pageable) {
+		return timeSlotJpaRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
+	}
+
 }
