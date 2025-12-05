@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.popjub.store_service.domain.entity.Store;
 import com.popjub.store_service.domain.entity.StoreCategory;
 import com.popjub.store_service.domain.repository.StoreCategoryRepository;
 
@@ -17,5 +18,10 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
 	@Override
 	public void saveAll(List <StoreCategory> storeCategories) {
 		 storeCategoryJpaRepository.saveAll(storeCategories);
+	}
+
+	@Override
+	public List<String> findCategoryNamesByStore(Store store) {
+		return storeCategoryJpaRepository.findByCategoryNameByStore(store);
 	}
 }

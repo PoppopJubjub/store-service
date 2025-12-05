@@ -2,13 +2,17 @@ package com.popjub.store_service.application.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
 import com.popjub.store_service.application.dto.result.CreateStoreResult;
+import com.popjub.store_service.application.dto.result.SearchStoreResult;
 import com.popjub.store_service.application.validation.StoreValidator;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.entity.Store;
@@ -18,6 +22,8 @@ import com.popjub.store_service.domain.repository.CategoryRepository;
 import com.popjub.store_service.domain.repository.StoreCategoryRepository;
 import com.popjub.store_service.domain.repository.StoreRepository;
 import com.popjub.store_service.domain.repository.StoreTimeRepository;
+import com.popjub.store_service.exception.StoreCustomException;
+import com.popjub.store_service.exception.StoreErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,9 +42,8 @@ public class StoreService {
 	public CreateStoreResult createStore(
 		CreateStoreCommand storeCommand,
 		List<CreateTimeRuleCommand> timeRuleCommands,
-		List<Long> categoryIds)
-	{
-		storeValidator.validateCreateStore(storeCommand, timeRuleCommands,categoryIds);
+		List<Long> categoryIds) {
+		storeValidator.validateCreateStore(storeCommand, timeRuleCommands, categoryIds);
 
 		Store store = storeRepository.save(storeCommand.toEntity());
 
@@ -65,5 +70,23 @@ public class StoreService {
 			result.add(StoreCategory.of(store, category));
 		}
 		return result;
+	}
+
+	public Page<SearchStoreResult> searchStore(Pageable pageable) {
+		Page<Store> storePage = storeRepository.findAll(pageable);
+
+		return storePage.map(store -> {
+			List<String> categories = storeCategoryRepository.findCategoryNamesByStore(store);
+			List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
+			return SearchStoreResult.from(store, categories, storeTimes);
+		});
+	}
+
+	public SearchStoreResult searchStoreDetail(UUID storeId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		List<String> categories = storeCategoryRepository.findCategoryNamesByStore(store);
+		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
+		return SearchStoreResult.from(store, categories, storeTimes);
 	}
 }

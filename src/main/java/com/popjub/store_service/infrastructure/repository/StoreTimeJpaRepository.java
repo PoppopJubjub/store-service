@@ -1,6 +1,7 @@
 package com.popjub.store_service.infrastructure.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,5 @@ import com.popjub.store_service.domain.entity.StoreTime;
 public interface StoreTimeJpaRepository extends JpaRepository<StoreTime, UUID> {
 
 	Optional<StoreTime> findByStoreAndDate(Store store, LocalDate date);
+	List<StoreTime> findAllByStore(Store store);
 }

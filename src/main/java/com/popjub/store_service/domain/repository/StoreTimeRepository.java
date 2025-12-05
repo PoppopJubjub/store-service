@@ -12,4 +12,6 @@ public interface StoreTimeRepository{
 	void saveAll(List<StoreTime> storeTimes);
 
 	Optional<StoreTime> findByStoreAndDate(Store store, LocalDate date);
+
+	List<StoreTime> findAllByStore(Store store);
 }
