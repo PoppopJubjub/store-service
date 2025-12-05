@@ -49,7 +49,7 @@ public class StoreValidator {
 	private void validateLocation(BigDecimal latitude, BigDecimal longitude) {
 		if (latitude.compareTo(BigDecimal.valueOf(-90)) < 0 ||
 			latitude.compareTo(BigDecimal.valueOf(90)) > 0) {
-			throw new StoreCustomException(StoreErrorCode.INVALID_LONGITUDE);
+			throw new StoreCustomException(StoreErrorCode.INVALID_LATITUDE);
 		}
 
 		if (longitude.compareTo(BigDecimal.valueOf(-180)) < 0 ||

@@ -14,7 +14,7 @@ public enum StoreErrorCode implements BaseErrorCode {
 	/**
 	 * 스토어
 	 */
-	INVALID_INVALID_LATITUDE("위도는 -90 ~ 90 범위여야 합니다.",  HttpStatus.BAD_REQUEST),
+	INVALID_LATITUDE("위도는 -90 ~ 90 범위여야 합니다.",  HttpStatus.BAD_REQUEST),
 	INVALID_LONGITUDE("경도는 -180 ~ 180 범위여야 합니다.", HttpStatus.BAD_REQUEST),
 	INVALID_OPERATION_PERIOD("운영 종료일은 시작일보다 빠를 수 없습니다.", HttpStatus.BAD_REQUEST),
 	INVALID_PRICE_POLICY("유료 스토어는 1 이상 가격이 필요합니다.",  HttpStatus.BAD_REQUEST),
