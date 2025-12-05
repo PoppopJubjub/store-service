@@ -5,6 +5,8 @@ import java.time.LocalTime;
 import org.springframework.stereotype.Component;
 
 import com.popjub.store_service.domain.entity.StoreTime;
+import com.popjub.store_service.exception.StoreCustomException;
+import com.popjub.store_service.exception.StoreErrorCode;
 
 @Component
 public class TimeSlotValidator {
@@ -18,7 +20,7 @@ public class TimeSlotValidator {
 		LocalTime close = storeTime.getEndTime();
 
 		if (!open.isBefore(close)) {
-			throw new IllegalArgumentException("운영 시작 시간이 종료 시간보다 같거나 늦을 수 없습니다.");
+			throw new StoreCustomException(StoreErrorCode.INVALID_STORE_TIME_RANGE);
 		}
 	}
 }
