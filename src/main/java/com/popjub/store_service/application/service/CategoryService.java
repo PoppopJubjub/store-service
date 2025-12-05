@@ -1,10 +1,13 @@
 package com.popjub.store_service.application.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateCategoryCommand;
 import com.popjub.store_service.application.dto.result.CreateCategoryResult;
+import com.popjub.store_service.application.dto.result.SearchCategoryResult;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.repository.CategoryRepository;
 import com.popjub.store_service.exception.StoreCustomException;
@@ -21,13 +24,25 @@ public class CategoryService {
 
 	@Transactional
 	public CreateCategoryResult createCategory(CreateCategoryCommand command) {
-		//todo : Admin Role만 가능하게 처리
+		// todo : Admin Role만 가능하게 처리
 
 		if (categoryRepository.existsByName(command.categoryName())) {
 			throw new StoreCustomException(StoreErrorCode.ALREADY_EXISTS_CATEGORY);
 		}
+
 		Category category = command.toEntity();
 		Category saved = categoryRepository.save(category);
 		return CreateCategoryResult.from(saved);
+	}
+
+	public Page<SearchCategoryResult> searchCategory(Pageable pageable) {
+		Page<Category> categoryPage = categoryRepository.findAll(pageable);
+		return categoryPage.map(SearchCategoryResult::from);
+	}
+
+	public SearchCategoryResult searchCategoryDetail(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+		return SearchCategoryResult.from(category);
 	}
 }
