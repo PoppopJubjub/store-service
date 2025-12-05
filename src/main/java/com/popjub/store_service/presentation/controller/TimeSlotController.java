@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,9 +25,7 @@ import com.popjub.store_service.application.dto.result.SearchTimeSlotResult;
 import com.popjub.store_service.application.service.TimeSlotService;
 import com.popjub.store_service.presentation.dto.request.CreateTimeSlotRequest;
 import com.popjub.store_service.presentation.dto.response.CreateTimeSlotResponse;
-import com.popjub.store_service.presentation.dto.response.SearchAllTimeSlotResponse;
 import com.popjub.store_service.presentation.dto.response.SearchTimeSlotResponse;
-import com.popjub.store_service.presentation.dto.response.TimeSlotSummaryResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,32 +60,43 @@ public class TimeSlotController {
 	}
 
 	@GetMapping("/timeslots")
-	public ApiResponse<PageResponse<SearchAllTimeSlotResponse>> getAllTimeSlots(
-		@PageableDefault(
-			size = 10,
-			sort = "storeName",
-			direction = Sort.Direction.ASC
-		)Pageable pageable
-	){
-		Page<SearchTimeSlotResult> result = timeSlotService.getAllTimeSlots(pageable);
-		Page<SearchAllTimeSlotResponse> response = result.map(SearchAllTimeSlotResponse::from);
-		PageResponse<SearchAllTimeSlotResponse> pageResponse = PageResponse.from(response);
+	public ApiResponse<PageResponse<SearchTimeSlotResponse>> getAllTimeSlots(
+		@PageableDefault(size = 10) Pageable pageable
+	) {
+		Pageable sortedPageable = PageRequest.of(
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			Sort.by(
+				Sort.Order.asc("date"),
+				Sort.Order.asc("store.name"),
+				Sort.Order.asc("startTime")
+			)
+		);
+		Page<SearchTimeSlotResult> result = timeSlotService.getAllTimeSlots(sortedPageable);
+		Page<SearchTimeSlotResponse> responsePage = result.map(SearchTimeSlotResponse::from);
+		PageResponse<SearchTimeSlotResponse> pageResponse = PageResponse.from(responsePage);
 		return ApiResponse.of(SuccessCode.OK, pageResponse);
 	}
 
+
 	@GetMapping("/{storeId}/timeslots")
-	public ApiResponse<PageResponse<TimeSlotSummaryResponse>> getStoreTimeSlotsByDate(
+	public ApiResponse<PageResponse<SearchTimeSlotResponse>> getStoreTimeSlotsByDate(
 		@PathVariable UUID storeId,
 		@RequestParam LocalDate date,
-		@PageableDefault(
-			size = 10,
-			sort = "startTime",
-			direction = Sort.Direction.ASC
-		) Pageable pageable
-	){
-		Page<SearchTimeSlotResult> result = timeSlotService.getStoreTimeSlots(storeId, date, pageable);
-		Page<TimeSlotSummaryResponse> response = result.map(TimeSlotSummaryResponse::from);
-		PageResponse<TimeSlotSummaryResponse> pageResponse = PageResponse.from(response);
-		return ApiResponse.of(SuccessCode.OK, pageResponse);
+		@PageableDefault(size = 10) Pageable pageable
+	) {
+		Pageable sortedPageable = PageRequest.of(
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			Sort.by(
+				Sort.Order.asc("date"),
+				Sort.Order.asc("startTime")
+			)
+		);
+		Page<SearchTimeSlotResult> result =
+			timeSlotService.getStoreTimeSlots(storeId, date, sortedPageable);
+		Page<SearchTimeSlotResponse> responsePage = result.map(SearchTimeSlotResponse::from);
+		return ApiResponse.of(SuccessCode.OK, PageResponse.from(responsePage));
 	}
+
 }
