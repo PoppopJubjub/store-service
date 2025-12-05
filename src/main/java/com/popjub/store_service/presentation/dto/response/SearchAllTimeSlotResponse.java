@@ -15,7 +15,7 @@ public record SearchAllTimeSlotResponse(
 ) {
 	public static SearchAllTimeSlotResponse from(SearchTimeSlotResult result) {
 		return new SearchAllTimeSlotResponse(
-			result.storeName(),   // or result.store().getName()
+			result.storeName(),
 			result.date(),
 			result.status(),
 			result.startTime(),
