@@ -1,5 +1,6 @@
 package com.popjub.store_service.presentation.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.popjub.common.enums.SuccessCode;
@@ -21,15 +23,19 @@ import com.popjub.common.response.PageResponse;
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
 import com.popjub.store_service.application.dto.command.UpdateStoreCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreTimeCommand;
 import com.popjub.store_service.application.dto.result.CreateStoreResult;
 import com.popjub.store_service.application.dto.result.SearchStoreResult;
 import com.popjub.store_service.application.dto.result.UpdateStoreResult;
+import com.popjub.store_service.application.dto.result.UpdateStoreTimeResult;
 import com.popjub.store_service.application.service.StoreService;
 import com.popjub.store_service.presentation.dto.request.CreateStoreRequest;
 import com.popjub.store_service.presentation.dto.request.UpdateStoreRequest;
+import com.popjub.store_service.presentation.dto.request.UpdateStoreTimeRequest;
 import com.popjub.store_service.presentation.dto.response.CreateStoreResponse;
 import com.popjub.store_service.presentation.dto.response.SearchStoreResponse;
 import com.popjub.store_service.presentation.dto.response.UpdateStoreResponse;
+import com.popjub.store_service.presentation.dto.response.UpdateStoreTimeResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +91,18 @@ public class StoreController {
 		UpdateStoreCommand command = request.toCommand();
 		UpdateStoreResult result = storeService.updateStore(storeId, command);
 		UpdateStoreResponse response = UpdateStoreResponse.from(result);
+		return ApiResponse.of(SuccessCode.OK, response);
+	}
+
+	@PutMapping("/{storeId}/store-times")
+	public ApiResponse<UpdateStoreTimeResponse> updateStoreTime(
+		@PathVariable UUID storeId,
+		@RequestParam LocalDate date,
+		@Valid @RequestBody UpdateStoreTimeRequest request
+	){
+		UpdateStoreTimeCommand command = request.toCommand();
+		UpdateStoreTimeResult result = storeService.updateStoreTime(storeId, date, command);
+		UpdateStoreTimeResponse response = UpdateStoreTimeResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 }

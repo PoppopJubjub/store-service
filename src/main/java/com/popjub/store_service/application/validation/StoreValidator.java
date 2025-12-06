@@ -3,6 +3,7 @@ package com.popjub.store_service.application.validation;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +53,13 @@ public class StoreValidator {
 			validateCategory(storeCommand.categoryIds());
 		}
 	}
+
+	public void validateUpdateStoreTime(LocalTime startTime, LocalTime endTime) {
+		if (!endTime.isAfter(startTime)) {
+			throw new StoreCustomException(StoreErrorCode.INVALID_STORE_TIME_RANGE);
+		}
+	}
+
 
 	// ================== 내부 검증 메서드들 ==================
 
