@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,12 +20,16 @@ import com.popjub.common.response.ApiResponse;
 import com.popjub.common.response.PageResponse;
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreCommand;
 import com.popjub.store_service.application.dto.result.CreateStoreResult;
 import com.popjub.store_service.application.dto.result.SearchStoreResult;
+import com.popjub.store_service.application.dto.result.UpdateStoreResult;
 import com.popjub.store_service.application.service.StoreService;
 import com.popjub.store_service.presentation.dto.request.CreateStoreRequest;
+import com.popjub.store_service.presentation.dto.request.UpdateStoreRequest;
 import com.popjub.store_service.presentation.dto.response.CreateStoreResponse;
 import com.popjub.store_service.presentation.dto.response.SearchStoreResponse;
+import com.popjub.store_service.presentation.dto.response.UpdateStoreResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +74,17 @@ public class StoreController {
 	){
 		SearchStoreResult result = storeService.searchStoreDetail(storeId);
 		SearchStoreResponse response = SearchStoreResponse.from(result);
+		return ApiResponse.of(SuccessCode.OK, response);
+	}
+
+	@PutMapping("/{storeId}")
+	public ApiResponse<UpdateStoreResponse> updateStore(
+		@PathVariable UUID storeId,
+		@Valid @RequestBody UpdateStoreRequest request
+	) {
+		UpdateStoreCommand command = request.toCommand();
+		UpdateStoreResult result = storeService.updateStore(storeId, command);
+		UpdateStoreResponse response = UpdateStoreResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 }

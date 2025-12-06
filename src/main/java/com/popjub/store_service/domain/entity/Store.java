@@ -62,6 +62,9 @@ public class Store extends BaseEntity {
 	@Column(name = "image_url", length = 500, nullable = true)
 	private String imageUrl;
 
+	@Column(name = "description", length = 500, nullable = true)
+	private String description;
+
 	/* ================== 공통 private 생성자 ================== */
 	@Builder(access = AccessLevel.PRIVATE)
 	private Store(Long storeManagerId,
@@ -140,29 +143,29 @@ public class Store extends BaseEntity {
 
 	/* ================== 도메인 수정 메서드 ================== */
 
-	public void updateStoreInfo(String name, String address,
-		BigDecimal latitude, BigDecimal longitude,
-		LocalDate startDate, LocalDate endDate) {
-
-		this.name = name;
-		this.address = address;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.startDate = startDate;
-		this.endDate = endDate;
-	}
-
-	public void updateReviewStats(BigDecimal newAvg, int newTotal) {
-		this.ratingAvg = newAvg;
-		this.totalReview = newTotal;
-	}
-
-	public void updatePricing(Boolean isFree, Integer price) {
-		this.isFree = isFree;
-		this.price = Boolean.TRUE.equals(isFree) ? null : price;
-	}
-
-	public void updateImage(String imageUrl) {
-		this.imageUrl = imageUrl;
+	//요청값이 하나면 하나만 수정되게
+	public void updateStore(
+		String name,
+		String address,
+		BigDecimal latitude,
+		BigDecimal longitude,
+		LocalDate startDate,
+		LocalDate endDate,
+		StoreStatus status,
+		Integer price,
+		String imageUrl,
+		String description
+	) {
+		if (name != null) this.name = name;
+		if (address != null) this.address = address;
+		if (latitude != null) this.latitude = latitude;
+		if (longitude != null) this.longitude = longitude;
+		if (startDate != null) this.startDate = startDate;
+		if (endDate != null) this.endDate = endDate;
+		if (status != null) this.status = status;
+		if (price != null) {this.isFree = false;this.price = price;}
+		else {this.isFree = true; this.price = null;}
+		if (imageUrl != null) this.imageUrl = imageUrl;
+		if (description != null) this.description = description;
 	}
 }

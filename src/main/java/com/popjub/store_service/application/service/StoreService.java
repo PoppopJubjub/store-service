@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreCommand;
 import com.popjub.store_service.application.dto.result.CreateStoreResult;
 import com.popjub.store_service.application.dto.result.SearchStoreResult;
+import com.popjub.store_service.application.dto.result.UpdateStoreResult;
 import com.popjub.store_service.application.validation.StoreValidator;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.entity.Store;
@@ -88,5 +90,28 @@ public class StoreService {
 		List<String> categories = storeCategoryRepository.findCategoryNamesByStore(store);
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
 		return SearchStoreResult.from(store, categories, storeTimes);
+	}
+
+	@Transactional
+	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+		storeValidator.validateUpdateStore(command);
+
+		store.updateStore(
+			command.storeName(),
+			command.address(),
+			command.latitude(),
+			command.longitude(),
+			command.startDate(),
+			command.endDate(),
+			command.status(),
+			command.price(),
+			command.imageUrl(),
+			command.description()
+		);
+		List<String> categoryNames = storeCategoryRepository.findCategoryNamesByStore(store);
+		return UpdateStoreResult.from(store, categoryNames);
 	}
 }
