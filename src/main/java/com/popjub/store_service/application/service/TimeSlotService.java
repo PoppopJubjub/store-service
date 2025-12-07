@@ -65,4 +65,36 @@ public class TimeSlotService {
 		Page<TimeSlot> timeSlotByStorePage = timeslotRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
 		return timeSlotByStorePage.map(SearchTimeSlotResult::from);
 	}
+
+	//스토어 타임 수정에 따른 자동 타임슬롯 재정의 메서드
+	@Transactional
+	public void RegenerateTimeSlots(Store store, LocalDate date){
+		List<TimeSlot> existing = timeslotRepository.findAllByStoreAndDate(store, date);
+		
+		if(existing.isEmpty()){
+			throw new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT);
+		}
+
+		//TimeSlot의 interval과 capacity 가져오기
+		TimeSlot baseSlot = existing.get(0);
+		Integer interval = baseSlot.getInterval();
+		Integer capacity = baseSlot.getCapacity();
+		
+		//기존 타임슬롯 제거
+		timeslotRepository.deleteAllByStoreAndDate(store, date);
+
+		//변경된 운영시간 조회
+		StoreTime storeTime = storeTimeRepository.findByStoreAndDate(store, date)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
+
+		//운영시간 기준으로 새 타임슬롯 생성
+		CreateTimeSlotCommand command = new CreateTimeSlotCommand(
+			date,
+			interval,
+			capacity
+		);
+
+		List<TimeSlot> newTimeSlots = command.createTimeslots(store, storeTime);
+		timeslotRepository.saveAll(newTimeSlots);
+	}
 }

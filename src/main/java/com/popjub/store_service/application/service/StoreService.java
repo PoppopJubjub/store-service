@@ -42,6 +42,7 @@ public class StoreService {
 	private final StoreCategoryRepository storeCategoryRepository;
 	private final StoreTimeRepository storeTimeRepository;
 	private final StoreValidator storeValidator;
+	private final TimeSlotService timeSlotService;
 
 	@Transactional
 	public CreateStoreResult createStore(
@@ -135,6 +136,7 @@ public class StoreService {
 			command.endTime()
 		);
 
+		timeSlotService.RegenerateTimeSlots(store, date);
 		return  UpdateStoreTimeResult.from(storeTime);
 	}
 }
