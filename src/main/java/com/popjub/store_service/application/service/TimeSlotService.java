@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateTimeSlotCommand;
+import com.popjub.store_service.application.dto.command.UpdateTimeSlotCommand;
 import com.popjub.store_service.application.dto.result.CreateTimeSlotResult;
 import com.popjub.store_service.application.dto.result.SearchTimeSlotResult;
+import com.popjub.store_service.application.dto.result.UpdateTimeSlotResult;
 import com.popjub.store_service.application.validation.TimeSlotValidator;
 import com.popjub.store_service.domain.entity.Store;
 import com.popjub.store_service.domain.entity.StoreTime;
@@ -96,5 +98,19 @@ public class TimeSlotService {
 
 		List<TimeSlot> newTimeSlots = command.createTimeslots(store, storeTime);
 		timeslotRepository.saveAll(newTimeSlots);
+	}
+
+	@Transactional
+	public UpdateTimeSlotResult updateTimeSlots(UUID timeSlotId, UpdateTimeSlotCommand command) {
+		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		//상태 변경
+		switch (command.status()){
+			case AVAILABLE -> timeSlot.makeAvailable();
+			case CLOSED -> timeSlot.close();
+			case FULL -> timeSlot.makeFull();
+		}
+
+		return UpdateTimeSlotResult.from(timeSlot);
 	}
 }

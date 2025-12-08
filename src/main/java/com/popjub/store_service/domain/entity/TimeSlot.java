@@ -76,17 +76,6 @@ public class TimeSlot extends BaseEntity{
 			.capacity(capacity)
 			.build();
 	}
-
-	/* ================== 도메인 수정 메서드 ================== */
-
-	public void updateTimeSlot(LocalDate date, LocalTime startTime, Integer interval, Integer capacity) {
-		this.date = date;
-		this.startTime = startTime;
-		this.interval = interval;
-		this.capacity = capacity;
-		// 검증 없음 → DTO/Service에서 보장
-	}
-
 	/* ================== 상태 변경 메서드 ================== */
 
 	public void close() {
