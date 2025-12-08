@@ -24,6 +24,8 @@ public enum StoreErrorCode implements BaseErrorCode {
 	NOT_FOUND_CATEGORY("카테고리를 찾을 수 없습니다." , HttpStatus.NOT_FOUND),
 	NOT_FOUND_STORE_TIME("운영시간을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	NOT_FOUND_TIME_SLOT("운영시간을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+	CATEGORY_IN_USE("사용중인 카테고리입니다." , HttpStatus.BAD_REQUEST),
+	FORBIDDEN_STORE_ACCESS("해당 스토어의 권한이 없습니다.", HttpStatus.FORBIDDEN),
 	/**
 	 * 타임룰/타임슬롯 관련 검증 에러
 	 */
