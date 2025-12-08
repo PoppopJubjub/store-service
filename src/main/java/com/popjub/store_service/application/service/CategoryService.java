@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateCategoryCommand;
+import com.popjub.store_service.application.dto.command.UpdateCategoryCommand;
 import com.popjub.store_service.application.dto.result.CreateCategoryResult;
 import com.popjub.store_service.application.dto.result.SearchCategoryResult;
+import com.popjub.store_service.application.dto.result.UpdateCategoryResult;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.repository.CategoryRepository;
 import com.popjub.store_service.exception.StoreCustomException;
@@ -44,5 +46,19 @@ public class CategoryService {
 		Category category = categoryRepository.findById(categoryId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 		return SearchCategoryResult.from(category);
+	}
+
+	@Transactional
+	//todo : 관리자용
+	public UpdateCategoryResult updateCategory(Long CategoryId, UpdateCategoryCommand command) {
+		Category category = categoryRepository.findById(CategoryId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+
+		if(!category.getCategoryName().equals(command.categoryName())&& categoryRepository.existsByName(command.categoryName())) {
+			throw new StoreCustomException(StoreErrorCode.ALREADY_EXISTS_CATEGORY);
+		}
+
+		category.updateCategoryName(command.categoryName());
+		return UpdateCategoryResult.from(category);
 	}
 }
