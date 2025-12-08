@@ -17,4 +17,6 @@ public interface TimeSlotJpaRepository extends JpaRepository<TimeSlot, UUID> {
 	List<TimeSlot> findAllByStoreAndDate(Store store, LocalDate date);
 
 	void deleteAllByStoreAndDate(Store store, LocalDate date);
+
+	List<TimeSlot> findAllByStoreAndDeletedAtIsNull(Store store);
 }

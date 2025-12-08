@@ -15,4 +15,7 @@ public interface StoreCategoryRepository{
 	List<StoreCategory> findAllByCategory(Category category);
 
 	Optional<StoreCategory> findByStoreAndCategory(Store store, Category category);
+
+	List<StoreCategory> findAllByStore(Store store);
+
 }

@@ -50,4 +50,8 @@ public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 		timeSlotJpaRepository.deleteAllByStoreAndDate(store, date);
 	}
 
+	@Override
+	public List<TimeSlot> findAllByStore(Store store) {
+		return timeSlotJpaRepository.findAllByStoreAndDeletedAtIsNull(store);
+	}
 }

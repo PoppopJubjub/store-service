@@ -24,11 +24,11 @@ public class StoreRepositoryImpl implements StoreRepository {
 
 	@Override
 	public Optional<Store> findById(UUID storeId) {
-		return storeJpaRepository.findById(storeId);
+		return storeJpaRepository.findByStoreIdAndDeletedAtIsNull(storeId);
 	}
 
 	@Override
 	public Page<Store> findAll(Pageable pageable) {
-		return storeJpaRepository.findAll(pageable);
+		return storeJpaRepository.findAllByDeletedAtIsNull(pageable);
 	}
 }

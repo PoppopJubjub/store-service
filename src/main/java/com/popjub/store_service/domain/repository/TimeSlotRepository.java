@@ -23,4 +23,6 @@ public interface TimeSlotRepository {
 	List<TimeSlot> findAllByStoreAndDate(Store store, LocalDate date);
 
 	void deleteAllByStoreAndDate(Store store, LocalDate date);
+
+	List<TimeSlot> findAllByStore(Store store);
 }

@@ -26,4 +26,6 @@ public interface StoreCategoryJpaRepository extends JpaRepository<StoreCategory,
 	List<StoreCategory> findAllByCategoryAndDeletedAtIsNull(Category category);
 
 	Optional<StoreCategory> findByStoreAndCategoryAndDeletedAtIsNull(Store store, Category category);
+
+	List<StoreCategory> findAllByStoreAndDeletedAtIsNull(Store store);
 }

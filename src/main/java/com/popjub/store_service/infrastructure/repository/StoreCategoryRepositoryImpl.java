@@ -36,4 +36,9 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
 	public Optional<StoreCategory> findByStoreAndCategory(Store store, Category category) {
 		return storeCategoryJpaRepository.findByStoreAndCategoryAndDeletedAtIsNull(store, category);
 	}
+
+	@Override
+	public List<StoreCategory> findAllByStore(Store store) {
+		return storeCategoryJpaRepository.findAllByStoreAndDeletedAtIsNull(store);
+	}
 }
