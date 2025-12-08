@@ -25,7 +25,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
 	@Override
 	public List<Category> findAllById(List<Long> categoryIds) {
-		return categoryJpaRepository.findAllById(categoryIds);
+		return categoryJpaRepository.findAllByCategoryIdInAndDeletedAtIsNull(categoryIds);
 	}
 
 	@Override
@@ -35,11 +35,11 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
 	@Override
 	public Optional<Category> findById(Long categoryId) {
-		return categoryJpaRepository.findById(categoryId);
+		return categoryJpaRepository.findByCategoryIdAndDeletedAtIsNull(categoryId);
 	}
 
 	@Override
 	public Page<Category> findAll(Pageable pageable) {
-		return categoryJpaRepository.findAll(pageable);
+		return categoryJpaRepository.findAllByDeletedAtIsNull(pageable);
 	}
 }

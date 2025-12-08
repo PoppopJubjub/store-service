@@ -24,16 +24,16 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
 
 	@Override
 	public List<String> findCategoryNamesByStore(Store store) {
-		return storeCategoryJpaRepository.findByCategoryNameByStore(store);
+		return storeCategoryJpaRepository.findActiveCategoryNamesByStore(store);
 	}
 
 	@Override
 	public List<StoreCategory> findAllByCategory(Category category) {
-		return storeCategoryJpaRepository.findAllByCategory(category);
+		return storeCategoryJpaRepository.findAllByCategoryAndDeletedAtIsNull(category);
 	}
 
 	@Override
 	public Optional<StoreCategory> findByStoreAndCategory(Store store, Category category) {
-		return storeCategoryJpaRepository.findByStoreAndCategory(store, category);
+		return storeCategoryJpaRepository.findByStoreAndCategoryAndDeletedAtIsNull(store, category);
 	}
 }
