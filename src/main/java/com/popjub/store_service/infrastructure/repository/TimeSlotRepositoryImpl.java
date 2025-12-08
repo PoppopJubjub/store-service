@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.popjub.store_service.domain.entity.Store;
 import com.popjub.store_service.domain.entity.TimeSlot;
 import com.popjub.store_service.domain.repository.TimeSlotRepository;
 
@@ -37,6 +38,16 @@ public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 	@Override
 	public Page<TimeSlot> findAllByStore_StoreIdAndDate(UUID storeId, LocalDate date, Pageable pageable) {
 		return timeSlotJpaRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
+	}
+
+	@Override
+	public List<TimeSlot> findAllByStoreAndDate(Store store, LocalDate date) {
+		return timeSlotJpaRepository.findAllByStoreAndDate(store, date);
+	}
+
+	@Override
+	public void deleteAllByStoreAndDate(Store store, LocalDate date) {
+		timeSlotJpaRepository.deleteAllByStoreAndDate(store, date);
 	}
 
 }

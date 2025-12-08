@@ -82,15 +82,8 @@ public class StoreTime  extends BaseEntity {
 
 	/* ================== 도메인 메서드 ================== */
 
-	/**
-	 * 운영 시간/날짜 수정 (요일은 date 기준으로 재계산)
-	 */
-	public void updateOperatingTime(LocalDate date,
-		LocalTime startTime,
-		LocalTime endTime) {
 
-		this.date = date;
-		this.dayOfWeek = date.getDayOfWeek();
+	public void updateStoreTime(LocalTime startTime, LocalTime endTime) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

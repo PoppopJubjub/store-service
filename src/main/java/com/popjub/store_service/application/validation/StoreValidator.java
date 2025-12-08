@@ -3,6 +3,7 @@ package com.popjub.store_service.application.validation;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreCommand;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.repository.CategoryRepository;
 import com.popjub.store_service.exception.StoreCustomException;
@@ -35,6 +37,29 @@ public class StoreValidator {
 		validateAllDayCovered(timeRuleCommands);
 		validateCategory(categoryIds);
 	}
+
+	public void validateUpdateStore(UpdateStoreCommand storeCommand){
+		if(storeCommand.latitude() != null || storeCommand.longitude() != null) {
+			if(storeCommand.latitude() != null && storeCommand.longitude() != null) {
+				validateLocation(storeCommand.latitude(), storeCommand.longitude());
+			}
+		}
+
+		if(storeCommand.startDate() != null || storeCommand.endDate() != null) {
+			validatePeriod(storeCommand.startDate(), storeCommand.endDate());
+		}
+		validatePricePolicy(storeCommand.price());
+		if(storeCommand.categoryIds() != null) {
+			validateCategory(storeCommand.categoryIds());
+		}
+	}
+
+	public void validateUpdateStoreTime(LocalTime startTime, LocalTime endTime) {
+		if (!endTime.isAfter(startTime)) {
+			throw new StoreCustomException(StoreErrorCode.INVALID_STORE_TIME_RANGE);
+		}
+	}
+
 
 	// ================== 내부 검증 메서드들 ==================
 

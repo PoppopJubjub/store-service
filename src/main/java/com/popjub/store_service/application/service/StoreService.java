@@ -1,5 +1,6 @@
 package com.popjub.store_service.application.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,8 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.store_service.application.dto.command.CreateStoreCommand;
 import com.popjub.store_service.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreCommand;
+import com.popjub.store_service.application.dto.command.UpdateStoreTimeCommand;
 import com.popjub.store_service.application.dto.result.CreateStoreResult;
 import com.popjub.store_service.application.dto.result.SearchStoreResult;
+import com.popjub.store_service.application.dto.result.UpdateStoreResult;
+import com.popjub.store_service.application.dto.result.UpdateStoreTimeResult;
 import com.popjub.store_service.application.validation.StoreValidator;
 import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.entity.Store;
@@ -37,6 +42,7 @@ public class StoreService {
 	private final StoreCategoryRepository storeCategoryRepository;
 	private final StoreTimeRepository storeTimeRepository;
 	private final StoreValidator storeValidator;
+	private final TimeSlotService timeSlotService;
 
 	@Transactional
 	public CreateStoreResult createStore(
@@ -88,5 +94,49 @@ public class StoreService {
 		List<String> categories = storeCategoryRepository.findCategoryNamesByStore(store);
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
 		return SearchStoreResult.from(store, categories, storeTimes);
+	}
+
+	@Transactional
+	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+		storeValidator.validateUpdateStore(command);
+
+		store.updateStore(
+			command.storeName(),
+			command.address(),
+			command.latitude(),
+			command.longitude(),
+			command.startDate(),
+			command.endDate(),
+			command.status(),
+			command.price(),
+			command.imageUrl(),
+			command.description()
+		);
+		List<String> categoryNames = storeCategoryRepository.findCategoryNamesByStore(store);
+		return UpdateStoreResult.from(store, categoryNames);
+	}
+
+	@Transactional
+	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		StoreTime storeTime = storeTimeRepository.findByStoreAndDate(store, date)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
+
+		storeValidator.validateUpdateStoreTime(
+			command.startTime(),
+			command.endTime()
+		);
+
+		storeTime.updateStoreTime(
+			command.startTime(),
+			command.endTime()
+		);
+
+		timeSlotService.RegenerateTimeSlots(store, date);
+		return  UpdateStoreTimeResult.from(storeTime);
 	}
 }
