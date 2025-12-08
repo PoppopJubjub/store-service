@@ -113,4 +113,13 @@ public class TimeSlotService {
 
 		return UpdateTimeSlotResult.from(timeSlot);
 	}
+
+	@Transactional
+	public void deleteTimeSlot(UUID timeSlotId){
+		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+
+		String deletedBy = "System";
+		timeSlot.softDelete(deletedBy);
+	}
 }

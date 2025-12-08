@@ -37,12 +37,12 @@ public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 
 	@Override
 	public Page<TimeSlot> findAllByStore_StoreIdAndDate(UUID storeId, LocalDate date, Pageable pageable) {
-		return timeSlotJpaRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
+		return timeSlotJpaRepository.findAllByStore_StoreIdAndDateAndDeletedAtIsNull(storeId, date, pageable);
 	}
 
 	@Override
 	public List<TimeSlot> findAllByStoreAndDate(Store store, LocalDate date) {
-		return timeSlotJpaRepository.findAllByStoreAndDate(store, date);
+		return timeSlotJpaRepository.findAllByStoreAndDateAndDeletedAtIsNull(store, date);
 	}
 
 	@Override

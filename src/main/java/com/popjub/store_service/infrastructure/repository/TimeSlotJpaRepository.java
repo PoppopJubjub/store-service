@@ -12,9 +12,9 @@ import com.popjub.store_service.domain.entity.Store;
 import com.popjub.store_service.domain.entity.TimeSlot;
 
 public interface TimeSlotJpaRepository extends JpaRepository<TimeSlot, UUID> {
-	Page<TimeSlot> findAllByStore_StoreIdAndDate(UUID storeId, LocalDate date, Pageable pageable);
+	Page<TimeSlot> findAllByStore_StoreIdAndDateAndDeletedAtIsNull(UUID storeId, LocalDate date, Pageable pageable);
 
-	List<TimeSlot> findAllByStoreAndDate(Store store, LocalDate date);
+	List<TimeSlot> findAllByStoreAndDateAndDeletedAtIsNull(Store store, LocalDate date);
 
 	void deleteAllByStoreAndDate(Store store, LocalDate date);
 
