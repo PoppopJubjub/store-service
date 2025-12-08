@@ -115,4 +115,12 @@ public class StoreController {
 		storeService.deleteStoreCategory(storeId, categoryId);
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
+
+	@DeleteMapping("{storeId}")
+	public ApiResponse<String> deleteStore(
+		@PathVariable UUID storeId
+	){
+		storeService.deleteStore(storeId);
+		return ApiResponse.of(SuccessCode.OK,"");
 	}
+}

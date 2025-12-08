@@ -23,10 +23,12 @@ import com.popjub.store_service.domain.entity.Category;
 import com.popjub.store_service.domain.entity.Store;
 import com.popjub.store_service.domain.entity.StoreCategory;
 import com.popjub.store_service.domain.entity.StoreTime;
+import com.popjub.store_service.domain.entity.TimeSlot;
 import com.popjub.store_service.domain.repository.CategoryRepository;
 import com.popjub.store_service.domain.repository.StoreCategoryRepository;
 import com.popjub.store_service.domain.repository.StoreRepository;
 import com.popjub.store_service.domain.repository.StoreTimeRepository;
+import com.popjub.store_service.domain.repository.TimeSlotRepository;
 import com.popjub.store_service.exception.StoreCustomException;
 import com.popjub.store_service.exception.StoreErrorCode;
 
@@ -41,6 +43,7 @@ public class StoreService {
 	private final CategoryRepository categoryRepository;
 	private final StoreCategoryRepository storeCategoryRepository;
 	private final StoreTimeRepository storeTimeRepository;
+	private final TimeSlotRepository timeSlotRepository;
 	private final StoreValidator storeValidator;
 	private final TimeSlotService timeSlotService;
 
@@ -143,7 +146,7 @@ public class StoreService {
 
 	@Transactional
 	public void deleteStoreCategory(UUID storeId, Long CategoryId) {
-		//todo StoreManger만 가능하게
+		//todo Admin, StoreManger(본인 가게)만 가능하게
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
@@ -156,5 +159,32 @@ public class StoreService {
 		String deletedBy = "System";
 
 		storeCategory.softDelete(deletedBy);
+	}
+
+	@Transactional
+	public void deleteStore(UUID storeId) {
+		//todo Admin, StoreManager(본인 가게)만 가능하게
+
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+		String deletedBy = "System";
+
+		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
+		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
+
+		for(StoreTime storeTime : storeTimes){
+			List<TimeSlot> timeSlots = timeSlotRepository.findAllByStore(store);
+			for(TimeSlot timeSlot : timeSlots){
+				timeSlot.softDelete(deletedBy);
+			}
+			storeTime.softDelete(deletedBy);
+		}
+		List<StoreCategory> categories = storeCategoryRepository.findAllByStore(store);
+		for(StoreCategory storeCategory : categories){
+			storeCategory.softDelete(deletedBy);
+		}
+
+		store.softDelete(deletedBy);
 	}
 }
