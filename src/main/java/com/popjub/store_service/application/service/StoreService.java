@@ -139,4 +139,25 @@ public class StoreService {
 		timeSlotService.RegenerateTimeSlots(store, date);
 		return  UpdateStoreTimeResult.from(storeTime);
 	}
+
+
+	@Transactional
+	public void deleteStoreCategory(UUID storeId, Long CategoryId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+		/*if(!store.getStoreManagerId().equals(CurrentUserID)) {
+			throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
+		}*/
+
+		Category category = categoryRepository.findById(CategoryId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+
+		StoreCategory storeCategory = storeCategoryRepository.findByStoreAndCategory(store, category)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+
+		String deletedBy = "System";
+
+		storeCategory.softDelete(deletedBy);
+	}
 }
