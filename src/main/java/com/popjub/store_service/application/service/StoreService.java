@@ -173,11 +173,12 @@ public class StoreService {
 		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
 
+		List<TimeSlot> timeSlots = timeSlotRepository.findAllByStore(store);
+
+		for(TimeSlot timeSlot : timeSlots){
+			timeSlot.softDelete(deletedBy);
+		}
 		for(StoreTime storeTime : storeTimes){
-			List<TimeSlot> timeSlots = timeSlotRepository.findAllByStore(store);
-			for(TimeSlot timeSlot : timeSlots){
-				timeSlot.softDelete(deletedBy);
-			}
 			storeTime.softDelete(deletedBy);
 		}
 		List<StoreCategory> categories = storeCategoryRepository.findAllByStore(store);
