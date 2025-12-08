@@ -13,7 +13,7 @@ import com.popjub.store_service.domain.entity.StoreCategory;
 
 public interface StoreCategoryJpaRepository extends JpaRepository<StoreCategory,Long> {
 
-	// ✅ 해당 스토어에 연결된 "삭제되지 않은" 카테고리 이름들만 조회
+	//해당 스토어에 연결된 "삭제되지 않은" 카테고리 이름들만 조회
 	@Query("""
 		select sc.category.categoryName 
 		from StoreCategory sc 
@@ -23,9 +23,7 @@ public interface StoreCategoryJpaRepository extends JpaRepository<StoreCategory,
 	""")
 	List<String> findActiveCategoryNamesByStore(@Param("store") Store store);
 
-	// ✅ 삭제되지 않은 StoreCategory 목록 반환 (카테고리 강제 삭제 시 soft delete용)
 	List<StoreCategory> findAllByCategoryAndDeletedAtIsNull(Category category);
 
-	// ✅ 삭제되지 않은 StoreCategory 한 건 조회 (스토어에서 카테고리 제거 시 사용)
 	Optional<StoreCategory> findByStoreAndCategoryAndDeletedAtIsNull(Store store, Category category);
 }
