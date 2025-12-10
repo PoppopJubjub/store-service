@@ -76,7 +76,7 @@ public class CategoryService {
 		Category category = categoryRepository.findById(CategoryId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 
-		String deletedBy = "System";
+		Long deletedBy = 1L;
 		List<StoreCategory> allCategory = storeCategoryRepository.findAllByCategory(category);
 		//해당 카테고리를 사용중인 스토어에서 스토어 카테고리 제거
 		for(StoreCategory storeCategory : allCategory) {
