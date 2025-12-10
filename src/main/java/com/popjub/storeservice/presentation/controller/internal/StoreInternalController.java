@@ -1,4 +1,4 @@
-package com.popjub.storeservice.presentation.controller;
+package com.popjub.storeservice.presentation.controller.internal;
 
 import java.util.UUID;
 
