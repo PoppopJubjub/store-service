@@ -106,9 +106,8 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
-		if(store.isNotManagedBy(currentUserId)) {
-			throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
-		}
+		storeValidator.isNotManagedBy(store, currentUserId);
+
 		storeValidator.validateUpdateStore(command);
 
 		store.updateStore(
@@ -128,11 +127,13 @@ public class StoreService {
 	}
 
 	@Transactional
-	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command) {
+	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command, Long currentUserId) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 		StoreTime storeTime = storeTimeRepository.findByStoreAndDate(store, date)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
+
+		storeValidator.isNotManagedBy(store, currentUserId);
 
 		storeValidator.validateUpdateStoreTime(
 			command.startTime(),
@@ -150,8 +151,7 @@ public class StoreService {
 
 
 	@Transactional
-	public void deleteStoreCategory(UUID storeId, Long CategoryId) {
-		//todo Admin, StoreManger(본인 가게)만 가능하게
+	public void deleteStoreCategory(UUID storeId, Long CategoryId, Long currentUserId) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
@@ -161,19 +161,18 @@ public class StoreService {
 		StoreCategory storeCategory = storeCategoryRepository.findByStoreAndCategory(store, category)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 
-		Long deletedBy = 1L;
+		storeValidator.isNotManagedBy(store, currentUserId);
 
-		storeCategory.softDelete(deletedBy);
+		storeCategory.softDelete(currentUserId);
 	}
 
 	@Transactional
-	public void deleteStore(UUID storeId) {
-		//todo Admin, StoreManager(본인 가게)만 가능하게
+	public void deleteStore(UUID storeId, Long currentUserId) {
 
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
-		Long deletedBy = 1L;
+		storeValidator.isNotManagedBy(store, currentUserId);
 
 		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
@@ -181,17 +180,17 @@ public class StoreService {
 		List<TimeSlot> timeSlots = timeSlotRepository.findAllByStore(store);
 
 		for(TimeSlot timeSlot : timeSlots){
-			timeSlot.softDelete(deletedBy);
+			timeSlot.softDelete(currentUserId);
 		}
 		for(StoreTime storeTime : storeTimes){
-			storeTime.softDelete(deletedBy);
+			storeTime.softDelete(currentUserId);
 		}
 		List<StoreCategory> categories = storeCategoryRepository.findAllByStore(store);
 		for(StoreCategory storeCategory : categories){
-			storeCategory.softDelete(deletedBy);
+			storeCategory.softDelete(currentUserId);
 		}
 
-		store.softDelete(deletedBy);
+		store.softDelete(currentUserId);
 	}
 
 	@Transactional
@@ -206,4 +205,5 @@ public class StoreService {
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 		store.decreaseRating(command.rating());
 	}
+
 }

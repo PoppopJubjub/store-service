@@ -107,30 +107,33 @@ public class StoreController {
 	public ApiResponse<UpdateStoreTimeResponse> updateStoreTime(
 		@PathVariable UUID storeId,
 		@RequestParam LocalDate date,
-		@Valid @RequestBody UpdateStoreTimeRequest request
+		@Valid @RequestBody UpdateStoreTimeRequest request,
+		@CurrentUser Long userId
 	){
 		UpdateStoreTimeCommand command = request.toCommand();
-		UpdateStoreTimeResult result = storeService.updateStoreTime(storeId, date, command);
+		UpdateStoreTimeResult result = storeService.updateStoreTime(storeId, date, command, userId);
 		UpdateStoreTimeResponse response = UpdateStoreTimeResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
 	@RoleCheck(UserRole.STORE_MANAGER)
 	@DeleteMapping("{storeId}/categories/{categoryId}")
-		public ApiResponse<String> deleteStoreCategory(
-			@PathVariable UUID storeId,
-			@PathVariable Long categoryId
-			){
-		storeService.deleteStoreCategory(storeId, categoryId);
+	public ApiResponse<String> deleteStoreCategory(
+		@PathVariable UUID storeId,
+		@PathVariable Long categoryId,
+		@CurrentUser Long userId
+	){
+		storeService.deleteStoreCategory(storeId, categoryId, userId);
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 
 	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@DeleteMapping("{storeId}")
 	public ApiResponse<String> deleteStore(
-		@PathVariable UUID storeId
+		@PathVariable UUID storeId,
+		@CurrentUser Long userId
 	){
-		storeService.deleteStore(storeId);
+		storeService.deleteStore(storeId, userId);
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 }
