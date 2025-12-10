@@ -119,7 +119,7 @@ public class TimeSlotService {
 		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
 
-		String deletedBy = "System";
+		Long deletedBy = 1L;
 		timeSlot.softDelete(deletedBy);
 	}
 }

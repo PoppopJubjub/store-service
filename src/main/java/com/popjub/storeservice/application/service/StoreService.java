@@ -157,7 +157,7 @@ public class StoreService {
 		StoreCategory storeCategory = storeCategoryRepository.findByStoreAndCategory(store, category)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 
-		String deletedBy = "System";
+		Long deletedBy = 1L;
 
 		storeCategory.softDelete(deletedBy);
 	}
@@ -169,7 +169,7 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
-		String deletedBy = "System";
+		Long deletedBy = 1L;
 
 		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
@@ -202,6 +202,4 @@ public class StoreService {
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 		store.decreaseRating(command.rating());
 	}
-
-
 }

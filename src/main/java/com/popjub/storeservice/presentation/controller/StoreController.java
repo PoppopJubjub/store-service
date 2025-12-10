@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.popjub.common.annotation.RoleCheck;
 import com.popjub.common.enums.SuccessCode;
+import com.popjub.common.enums.UserRole;
 import com.popjub.common.response.ApiResponse;
 import com.popjub.common.response.PageResponse;
 import com.popjub.storeservice.application.dto.command.CreateStoreCommand;
@@ -48,6 +50,7 @@ public class StoreController {
 
 	private final StoreService storeService;
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PostMapping
 	public ApiResponse<CreateStoreResponse> createStore(
 		@Valid @RequestBody CreateStoreRequest request) {
@@ -84,6 +87,7 @@ public class StoreController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PutMapping("/{storeId}")
 	public ApiResponse<UpdateStoreResponse> updateStore(
 		@PathVariable UUID storeId,
@@ -95,6 +99,7 @@ public class StoreController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PutMapping("/{storeId}/store-times")
 	public ApiResponse<UpdateStoreTimeResponse> updateStoreTime(
 		@PathVariable UUID storeId,
@@ -107,6 +112,7 @@ public class StoreController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck(UserRole.STORE_MANAGER)
 	@DeleteMapping("{storeId}/categories/{categoryId}")
 		public ApiResponse<String> deleteStoreCategory(
 			@PathVariable UUID storeId,
@@ -116,6 +122,7 @@ public class StoreController {
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@DeleteMapping("{storeId}")
 	public ApiResponse<String> deleteStore(
 		@PathVariable UUID storeId

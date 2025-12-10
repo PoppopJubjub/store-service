@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.popjub.common.annotation.RoleCheck;
 import com.popjub.common.enums.SuccessCode;
+import com.popjub.common.enums.UserRole;
 import com.popjub.common.response.ApiResponse;
 import com.popjub.common.response.PageResponse;
 import com.popjub.storeservice.application.dto.command.CreateTimeSlotCommand;
@@ -43,6 +45,7 @@ public class TimeSlotController {
 
 	private final TimeSlotService timeSlotService;
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PostMapping("/{storeId}/timeslots")
 	public ApiResponse<CreateTimeSlotResponse> createTimeSlots(
 		@PathVariable UUID storeId,
@@ -54,6 +57,7 @@ public class TimeSlotController {
 
 		return ApiResponse.of(SuccessCode.CREATED, response);
 	}
+
 
 	@GetMapping("/{storeId}/timeslots/{timeSlotId}")
 	public ApiResponse<SearchTimeSlotResponse> getTimeSlots(
@@ -105,6 +109,7 @@ public class TimeSlotController {
 		return ApiResponse.of(SuccessCode.OK, PageResponse.from(responsePage));
 	}
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PutMapping("/{storeId}/timeslots/{timeslotId}")
 	public ApiResponse<UpdateTimeSlotResponse> updateTimeSlots(
 		@PathVariable UUID storeId,
@@ -117,6 +122,7 @@ public class TimeSlotController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@DeleteMapping("/timeslots/{timeSlotId}")
 	public ApiResponse<String> deleteTimeSlot(
 		@PathVariable UUID timeSlotId

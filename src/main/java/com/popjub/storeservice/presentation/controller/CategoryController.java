@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.popjub.common.annotation.RoleCheck;
 import com.popjub.common.enums.SuccessCode;
+import com.popjub.common.enums.UserRole;
 import com.popjub.common.response.ApiResponse;
 import com.popjub.common.response.PageResponse;
 import com.popjub.storeservice.application.dto.command.CreateCategoryCommand;
@@ -40,6 +41,7 @@ public class CategoryController {
 	private final CategoryService categoryService;
 
 
+	@RoleCheck(UserRole.ADMIN)
 	@PostMapping
 	public ApiResponse<CreateCategoryResponse> createCategory(
 		@Valid @RequestBody CreateCategoryRequest request){
@@ -72,6 +74,7 @@ public class CategoryController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck(UserRole.ADMIN)
 	@PutMapping("/{categoryId}")
 	public ApiResponse<UpdateCategoryResponse> updateCategory(
 		@PathVariable Long categoryId,
@@ -83,6 +86,7 @@ public class CategoryController {
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
 
+	@RoleCheck(UserRole.ADMIN)
 	@DeleteMapping("/{categoryId}")
 	public ApiResponse<String> deleteCategory(
 		@PathVariable Long categoryId
