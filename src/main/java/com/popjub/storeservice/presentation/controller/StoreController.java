@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.popjub.common.annotation.CurrentUser;
 import com.popjub.common.annotation.RoleCheck;
+import com.popjub.common.context.UserContext;
 import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.enums.UserRole;
 import com.popjub.common.response.ApiResponse;
@@ -55,12 +56,12 @@ public class StoreController {
 	@PostMapping
 	public ApiResponse<CreateStoreResponse> createStore(
 		@Valid @RequestBody CreateStoreRequest request,
-		@CurrentUser Long userId) {
+		@CurrentUser UserContext user) {
 		CreateStoreCommand storeCommand = request.toStoreCommand();
 		List<CreateTimeRuleCommand> timeRuleCommand = request.toTimeRulesCommand();
 		List<Long> categoryIds = request.toCategoryIds();
 
-		CreateStoreResult result = storeService.createStore(storeCommand, timeRuleCommand, categoryIds, userId);
+		CreateStoreResult result = storeService.createStore(storeCommand, timeRuleCommand, categoryIds, user.getUserId());
 
 		CreateStoreResponse response = CreateStoreResponse.from(result);
 		return ApiResponse.of(SuccessCode.CREATED, response);
@@ -94,10 +95,10 @@ public class StoreController {
 	public ApiResponse<UpdateStoreResponse> updateStore(
 		@PathVariable UUID storeId,
 		@Valid @RequestBody UpdateStoreRequest request,
-		@CurrentUser Long userId
-	) {
+		@CurrentUser UserContext user
+		) {
 		UpdateStoreCommand command = request.toCommand();
-		UpdateStoreResult result = storeService.updateStore(storeId, command, userId);
+		UpdateStoreResult result = storeService.updateStore(storeId, command, user.getUserId(), user.getRoles());
 		UpdateStoreResponse response = UpdateStoreResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
@@ -108,10 +109,10 @@ public class StoreController {
 		@PathVariable UUID storeId,
 		@RequestParam LocalDate date,
 		@Valid @RequestBody UpdateStoreTimeRequest request,
-		@CurrentUser Long userId
+		@CurrentUser UserContext user
 	){
 		UpdateStoreTimeCommand command = request.toCommand();
-		UpdateStoreTimeResult result = storeService.updateStoreTime(storeId, date, command, userId);
+		UpdateStoreTimeResult result = storeService.updateStoreTime(storeId, date, command, user.getUserId(), user.getRoles());
 		UpdateStoreTimeResponse response = UpdateStoreTimeResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
@@ -121,9 +122,9 @@ public class StoreController {
 	public ApiResponse<String> deleteStoreCategory(
 		@PathVariable UUID storeId,
 		@PathVariable Long categoryId,
-		@CurrentUser Long userId
+		@CurrentUser UserContext user
 	){
-		storeService.deleteStoreCategory(storeId, categoryId, userId);
+		storeService.deleteStoreCategory(storeId, categoryId, user.getUserId(), user.getRoles());
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 
@@ -131,9 +132,9 @@ public class StoreController {
 	@DeleteMapping("{storeId}")
 	public ApiResponse<String> deleteStore(
 		@PathVariable UUID storeId,
-		@CurrentUser Long userId
+		@CurrentUser UserContext user
 	){
-		storeService.deleteStore(storeId, userId);
+		storeService.deleteStore(storeId, user.getUserId(), user.getRoles());
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 }

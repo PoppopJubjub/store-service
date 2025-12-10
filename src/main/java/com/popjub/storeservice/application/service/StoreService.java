@@ -102,11 +102,11 @@ public class StoreService {
 	}
 
 	@Transactional
-	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command, Long currentUserId) {
+	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command, Long currentUserId, List<String> role) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
-		storeValidator.isNotManagedBy(store, currentUserId);
+		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
 		storeValidator.validateUpdateStore(command);
 
@@ -127,13 +127,13 @@ public class StoreService {
 	}
 
 	@Transactional
-	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command, Long currentUserId) {
+	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command, Long currentUserId, List<String> role) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 		StoreTime storeTime = storeTimeRepository.findByStoreAndDate(store, date)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
 
-		storeValidator.isNotManagedBy(store, currentUserId);
+		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
 		storeValidator.validateUpdateStoreTime(
 			command.startTime(),
@@ -151,7 +151,7 @@ public class StoreService {
 
 
 	@Transactional
-	public void deleteStoreCategory(UUID storeId, Long CategoryId, Long currentUserId) {
+	public void deleteStoreCategory(UUID storeId, Long CategoryId, Long currentUserId, List<String> role) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
@@ -161,19 +161,18 @@ public class StoreService {
 		StoreCategory storeCategory = storeCategoryRepository.findByStoreAndCategory(store, category)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 
-		storeValidator.isNotManagedBy(store, currentUserId);
+		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
 		storeCategory.softDelete(currentUserId);
 	}
 
 	@Transactional
-	public void deleteStore(UUID storeId, Long currentUserId) {
+	public void deleteStore(UUID storeId, Long currentUserId, List<String> role) {
 
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
-		storeValidator.isNotManagedBy(store, currentUserId);
-
+		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
 		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
 
