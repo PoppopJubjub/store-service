@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.popjub.common.annotation.CurrentUser;
 import com.popjub.common.annotation.RoleCheck;
 import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.enums.UserRole;
@@ -53,7 +54,8 @@ public class StoreController {
 	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@PostMapping
 	public ApiResponse<CreateStoreResponse> createStore(
-		@Valid @RequestBody CreateStoreRequest request) {
+		@Valid @RequestBody CreateStoreRequest request,
+		@CurrentUser Long userId) {
 		CreateStoreCommand storeCommand = request.toStoreCommand();
 		List<CreateTimeRuleCommand> timeRuleCommand = request.toTimeRulesCommand();
 		List<Long> categoryIds = request.toCategoryIds();
@@ -91,10 +93,11 @@ public class StoreController {
 	@PutMapping("/{storeId}")
 	public ApiResponse<UpdateStoreResponse> updateStore(
 		@PathVariable UUID storeId,
-		@Valid @RequestBody UpdateStoreRequest request
+		@Valid @RequestBody UpdateStoreRequest request,
+		@CurrentUser Long userId
 	) {
 		UpdateStoreCommand command = request.toCommand();
-		UpdateStoreResult result = storeService.updateStore(storeId, command);
+		UpdateStoreResult result = storeService.updateStore(storeId, command, userId);
 		UpdateStoreResponse response = UpdateStoreResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}

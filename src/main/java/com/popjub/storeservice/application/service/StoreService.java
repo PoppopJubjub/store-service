@@ -101,10 +101,13 @@ public class StoreService {
 	}
 
 	@Transactional
-	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command) {
+	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command, Long currentUserId) {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
 
+		if(store.isNotManagedBy(currentUserId)) {
+			throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
+		}
 		storeValidator.validateUpdateStore(command);
 
 		store.updateStore(

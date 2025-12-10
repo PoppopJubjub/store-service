@@ -206,4 +206,9 @@ public class Store extends BaseEntity {
 		this.totalReview -= 1;
 		this.ratingAvg = newAvg;
 	}
+
+	//storeManager 판별
+	public boolean isNotManagedBy(Long userId) {
+		return this.storeManagerId == null || !this.storeManagerId.equals(userId);
+	}
 }
