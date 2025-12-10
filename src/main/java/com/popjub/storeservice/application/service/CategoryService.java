@@ -33,8 +33,6 @@ public class CategoryService {
 
 	@Transactional
 	public CreateCategoryResult createCategory(CreateCategoryCommand command) {
-		// todo : Admin Role만 가능하게 처리
-
 		if (categoryRepository.existsByName(command.categoryName())) {
 			throw new StoreCustomException(StoreErrorCode.ALREADY_EXISTS_CATEGORY);
 		}
@@ -56,7 +54,6 @@ public class CategoryService {
 	}
 
 	@Transactional
-	//todo : 관리자용
 	public UpdateCategoryResult updateCategory(Long CategoryId, UpdateCategoryCommand command) {
 		Category category = categoryRepository.findById(CategoryId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
@@ -72,7 +69,6 @@ public class CategoryService {
 
 	@Transactional
 	public void deleteCategory(Long CategoryId) {
-		//todo : 관리자용
 		Category category = categoryRepository.findById(CategoryId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
 
