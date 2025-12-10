@@ -13,11 +13,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateStoreRequest(
 
-	//image
-
-	@NotNull(message = "스토어 매니저 ID는 필수입니다.")
-	Long storeManagerId,
-
 	@NotBlank(message = "스토어 이름은 필수입니다.")
 	String storeName,
 
@@ -47,7 +42,6 @@ public record CreateStoreRequest(
 
 	public CreateStoreCommand toStoreCommand() {
 		return new CreateStoreCommand(
-			storeManagerId,
 			storeName,
 			address,
 			latitude,

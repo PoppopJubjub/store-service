@@ -60,7 +60,7 @@ public class StoreController {
 		List<CreateTimeRuleCommand> timeRuleCommand = request.toTimeRulesCommand();
 		List<Long> categoryIds = request.toCategoryIds();
 
-		CreateStoreResult result = storeService.createStore(storeCommand, timeRuleCommand, categoryIds);
+		CreateStoreResult result = storeService.createStore(storeCommand, timeRuleCommand, categoryIds, userId);
 
 		CreateStoreResponse response = CreateStoreResponse.from(result);
 		return ApiResponse.of(SuccessCode.CREATED, response);

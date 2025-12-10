@@ -52,10 +52,11 @@ public class StoreService {
 	public CreateStoreResult createStore(
 		CreateStoreCommand storeCommand,
 		List<CreateTimeRuleCommand> timeRuleCommands,
-		List<Long> categoryIds) {
+		List<Long> categoryIds,
+		Long currentUserId) {
 		storeValidator.validateCreateStore(storeCommand, timeRuleCommands, categoryIds);
 
-		Store store = storeRepository.save(storeCommand.toEntity());
+		Store store = storeRepository.save(storeCommand.toEntity(currentUserId));
 
 		List<StoreTime> storeTimes =
 			timeRuleCommands.stream()

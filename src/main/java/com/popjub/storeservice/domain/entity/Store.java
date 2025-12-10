@@ -105,7 +105,8 @@ public class Store extends BaseEntity {
 	/* ================== 생성자 2개(유료/무료) ================== */
 
 	// 무료 스토어 생성
-	public static Store createFreeStore(Long storeManagerId,
+	public static Store createFreeStore(
+		Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
@@ -127,7 +128,8 @@ public class Store extends BaseEntity {
 	}
 
 	// 유료 스토어 생성
-	public static Store createPaidStore(Long storeManagerId,
+	public static Store createPaidStore(
+		Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
