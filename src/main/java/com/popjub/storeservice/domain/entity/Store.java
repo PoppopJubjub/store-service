@@ -1,12 +1,20 @@
 package com.popjub.storeservice.domain.entity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.UUID;
 
 import com.popjub.common.entity.BaseEntity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -167,5 +175,35 @@ public class Store extends BaseEntity {
 		else {this.isFree = true; this.price = null;}
 		if (imageUrl != null) this.imageUrl = imageUrl;
 		if (description != null) this.description = description;
+	}
+
+	//리뷰 생성시 평점 업데이트
+	public void increaseRating(Integer rating) {
+		BigDecimal intRating = BigDecimal.valueOf(rating);
+		BigDecimal total = BigDecimal.valueOf(this.totalReview);
+
+		//기존 총합 + 새 평점 / 기존 리뷰수 + 1, 소수점 첫째자리까지 반올림
+		BigDecimal sum = this.ratingAvg.multiply(total).add(intRating);
+		BigDecimal newAvg = sum.divide(total.add(BigDecimal.ONE), 1, RoundingMode.HALF_UP);
+
+		this.totalReview += 1;
+		this.ratingAvg = newAvg;
+	}
+	//리뷰 삭제시 평점 업데이트
+	public void decreaseRating(Integer rating) {
+		//리뷰가 1개 남아있을 때 삭제된 경우 ratingAvg,totalReview = 0으로 만듦
+		if(this.totalReview <= 1) {
+			this.totalReview = 0;
+			this.ratingAvg = BigDecimal.ZERO;
+			return;
+		}
+		BigDecimal intRating = BigDecimal.valueOf(rating);
+		BigDecimal total = BigDecimal.valueOf(this.totalReview);
+
+		BigDecimal sum = this.ratingAvg.multiply(total).subtract(intRating);
+		BigDecimal newAvg = sum.divide(total.subtract(BigDecimal.ONE), 1, RoundingMode.HALF_UP);
+
+		this.totalReview -= 1;
+		this.ratingAvg = newAvg;
 	}
 }

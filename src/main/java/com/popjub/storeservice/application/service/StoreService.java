@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.storeservice.application.dto.command.CreateStoreCommand;
 import com.popjub.storeservice.application.dto.command.CreateTimeRuleCommand;
+import com.popjub.storeservice.application.dto.command.UpdateRatingCommand;
 import com.popjub.storeservice.application.dto.command.UpdateStoreCommand;
 import com.popjub.storeservice.application.dto.command.UpdateStoreTimeCommand;
 import com.popjub.storeservice.application.dto.result.CreateStoreResult;
@@ -188,4 +189,19 @@ public class StoreService {
 
 		store.softDelete(deletedBy);
 	}
+
+	@Transactional
+	public void increaseRating(UpdateRatingCommand command) {
+		Store store = storeRepository.findById(command.storeId())
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		store.increaseRating(command.rating());
+	}
+	@Transactional
+	public void decreaseRating(UpdateRatingCommand command) {
+		Store store = storeRepository.findById(command.storeId())
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		store.decreaseRating(command.rating());
+	}
+
+
 }
