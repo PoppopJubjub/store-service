@@ -2,6 +2,7 @@ package com.popjub.storeservice.application.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -12,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.popjub.storeservice.application.dto.command.CreateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.command.UpdateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.result.CreateTimeSlotResult;
+import com.popjub.storeservice.application.dto.result.GetRemainingResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotInternalResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.UpdateTimeSlotResult;
+import com.popjub.storeservice.application.port.ReservationServicePort;
 import com.popjub.storeservice.application.validation.StoreValidator;
 import com.popjub.storeservice.application.validation.TimeSlotValidator;
 import com.popjub.storeservice.domain.entity.Store;
@@ -38,6 +41,7 @@ public class TimeSlotService {
 	private final StoreRepository storeRepository;
 	private final TimeSlotValidator timeSlotValidator;
 	private final StoreValidator storeValidator;
+	private final ReservationServicePort reservationServicePort;
 
 	@Transactional
 	public CreateTimeSlotResult createTimeslots(UUID storeId, CreateTimeSlotCommand command, Long currentUserId, List<String> role) {
@@ -68,9 +72,27 @@ public class TimeSlotService {
 		return timeSlotPage.map(SearchTimeSlotResult::from);
 	}
 
-	public Page<SearchTimeSlotResult> getStoreTimeSlots(UUID storeId, LocalDate date, Pageable pageable){
+	public Page<GetRemainingResult> getStoreTimeSlots(UUID storeId, LocalDate date, Pageable pageable){
 		Page<TimeSlot> timeSlotByStorePage = timeslotRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
-		return timeSlotByStorePage.map(SearchTimeSlotResult::from);
+
+		//페이지에 있는 타임슬롯들의 ID 뽑아서 리스트로 만들기
+		List<UUID> timeslotIds = timeSlotByStorePage.stream()
+			.map(TimeSlot::getTimeslotId)
+			.toList();
+
+		//예약측으로 조회 요청
+		Map<UUID, Integer> capacities = reservationServicePort.getCapacities(timeslotIds);
+
+		//결과 매핑
+		return timeSlotByStorePage.map(
+			timeSlot -> {
+				Integer remaining = capacities.getOrDefault(
+					timeSlot.getTimeslotId(),
+					timeSlot.getCapacity()
+				);
+				return GetRemainingResult.from(timeSlot, remaining);
+			}
+		);
 	}
 
 	//스토어 타임 수정에 따른 자동 타임슬롯 재정의 메서드
