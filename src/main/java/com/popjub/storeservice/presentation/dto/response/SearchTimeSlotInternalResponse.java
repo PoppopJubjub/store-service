@@ -13,8 +13,7 @@ public record SearchTimeSlotInternalResponse(
 	String storeName,
 	LocalDate reservationDate,
 	LocalTime reservationTime,
-	TimeSlotStatus status,
-	Integer capacity
+	TimeSlotStatus status
 ) {
 	public static SearchTimeSlotInternalResponse from(SearchTimeSlotInternalResult result) {
 		return new SearchTimeSlotInternalResponse(
@@ -23,8 +22,7 @@ public record SearchTimeSlotInternalResponse(
 			result.storeName(),
 			result.reservationDate(),
 			result.reservationTime(),
-			result.status(),
-			result.capacity()
+			result.status()
 		);
 	}
 }

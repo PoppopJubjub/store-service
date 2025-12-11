@@ -13,8 +13,7 @@ public record SearchTimeSlotInternalResult(
 	String storeName,
 	LocalDate reservationDate,
 	LocalTime reservationTime,
-	TimeSlotStatus status,
-	Integer capacity
+	TimeSlotStatus status
 ) {
 	public static SearchTimeSlotInternalResult from(TimeSlot timeslot) {
 		return new SearchTimeSlotInternalResult(
@@ -23,8 +22,7 @@ public record SearchTimeSlotInternalResult(
 			timeslot.getStore().getName(),
 			timeslot.getDate(),
 			timeslot.getStartTime(),
-			TimeSlotStatus.valueOf(timeslot.getStatus().name()),
-			timeslot.getCapacity()
+			TimeSlotStatus.valueOf(timeslot.getStatus().name())
 		);
 	}
 }
