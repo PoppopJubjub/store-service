@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.popjub.storeservice.application.dto.command.CreateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.command.UpdateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.result.CreateTimeSlotResult;
+import com.popjub.storeservice.application.dto.result.SearchTimeSlotInternalResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.UpdateTimeSlotResult;
 import com.popjub.storeservice.application.validation.StoreValidator;
@@ -128,5 +129,12 @@ public class TimeSlotService {
 		timeSlotValidator.validateUpdateTimeSlot(timeSlot, currentUserId, role);
 
 		timeSlot.softDelete(currentUserId);
+	}
+
+	public SearchTimeSlotInternalResult getTimeSlotInternal(UUID timeSlotId){
+		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+
+		return  SearchTimeSlotInternalResult.from(timeSlot);
 	}
 }
