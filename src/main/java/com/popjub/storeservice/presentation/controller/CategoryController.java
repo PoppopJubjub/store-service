@@ -90,7 +90,6 @@ public class CategoryController {
 	@DeleteMapping("/{categoryId}")
 	public ApiResponse<String> deleteCategory(
 		@PathVariable Long categoryId
-		//todo CurrentUser 추가
 	){
 		categoryService.deleteCategory(categoryId);
 		return ApiResponse.of(SuccessCode.OK, "");

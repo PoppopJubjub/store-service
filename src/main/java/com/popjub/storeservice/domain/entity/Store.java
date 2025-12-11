@@ -105,7 +105,8 @@ public class Store extends BaseEntity {
 	/* ================== 생성자 2개(유료/무료) ================== */
 
 	// 무료 스토어 생성
-	public static Store createFreeStore(Long storeManagerId,
+	public static Store createFreeStore(
+		Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
@@ -127,7 +128,8 @@ public class Store extends BaseEntity {
 	}
 
 	// 유료 스토어 생성
-	public static Store createPaidStore(Long storeManagerId,
+	public static Store createPaidStore(
+		Long storeManagerId,
 		String name,
 		String address,
 		BigDecimal latitude,
@@ -205,5 +207,10 @@ public class Store extends BaseEntity {
 
 		this.totalReview -= 1;
 		this.ratingAvg = newAvg;
+	}
+
+	//storeManager 판별
+	public boolean isNotManagedBy(Long userId) {
+		return this.storeManagerId == null || !this.storeManagerId.equals(userId);
 	}
 }

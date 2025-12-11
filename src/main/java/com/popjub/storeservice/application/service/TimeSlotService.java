@@ -14,6 +14,7 @@ import com.popjub.storeservice.application.dto.command.UpdateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.result.CreateTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.UpdateTimeSlotResult;
+import com.popjub.storeservice.application.validation.StoreValidator;
 import com.popjub.storeservice.application.validation.TimeSlotValidator;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.StoreTime;
@@ -35,12 +36,15 @@ public class TimeSlotService {
 	private final StoreTimeRepository storeTimeRepository;
 	private final StoreRepository storeRepository;
 	private final TimeSlotValidator timeSlotValidator;
+	private final StoreValidator storeValidator;
 
 	@Transactional
-	public CreateTimeSlotResult createTimeslots(UUID storeId, CreateTimeSlotCommand command) {
+	public CreateTimeSlotResult createTimeslots(UUID storeId, CreateTimeSlotCommand command, Long currentUserId, List<String> role) {
 
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
 		StoreTime storeTime = storeTimeRepository
 			.findByStoreAndDate(store, command.date())
@@ -101,10 +105,12 @@ public class TimeSlotService {
 	}
 
 	@Transactional
-	public UpdateTimeSlotResult updateTimeSlots(UUID timeSlotId, UpdateTimeSlotCommand command) {
+	public UpdateTimeSlotResult updateTimeSlots(UUID timeSlotId, UpdateTimeSlotCommand command, Long currentUserId, List<String> role) {
 		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
 		//상태 변경
+		timeSlotValidator.validateUpdateTimeSlot(timeSlot, currentUserId, role);
+
 		switch (command.status()){
 			case AVAILABLE -> timeSlot.makeAvailable();
 			case CLOSED -> timeSlot.close();
@@ -115,11 +121,12 @@ public class TimeSlotService {
 	}
 
 	@Transactional
-	public void deleteTimeSlot(UUID timeSlotId){
+	public void deleteTimeSlot(UUID timeSlotId, Long currentUserId, List<String> role) {
 		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
 
-		Long deletedBy = 1L;
-		timeSlot.softDelete(deletedBy);
+		timeSlotValidator.validateUpdateTimeSlot(timeSlot, currentUserId, role);
+
+		timeSlot.softDelete(currentUserId);
 	}
 }

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.popjub.common.annotation.CurrentUser;
 import com.popjub.common.annotation.RoleCheck;
+import com.popjub.common.context.UserContext;
 import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.enums.UserRole;
 import com.popjub.common.response.ApiResponse;
@@ -49,19 +51,19 @@ public class TimeSlotController {
 	@PostMapping("/{storeId}/timeslots")
 	public ApiResponse<CreateTimeSlotResponse> createTimeSlots(
 		@PathVariable UUID storeId,
-		@Valid @RequestBody CreateTimeSlotRequest request
+		@Valid @RequestBody CreateTimeSlotRequest request,
+		@CurrentUser UserContext user
 	){
 		CreateTimeSlotCommand command = request.toCommand();
-		CreateTimeSlotResult result = timeSlotService.createTimeslots(storeId, command);
+		CreateTimeSlotResult result = timeSlotService.createTimeslots(storeId, command, user.getUserId(), user.getRoles());
 		CreateTimeSlotResponse response = CreateTimeSlotResponse.from(result);
 
 		return ApiResponse.of(SuccessCode.CREATED, response);
 	}
 
 
-	@GetMapping("/{storeId}/timeslots/{timeSlotId}")
+	@GetMapping("/timeslots/{timeSlotId}")
 	public ApiResponse<SearchTimeSlotResponse> getTimeSlots(
-		@PathVariable UUID storeId,
 		@PathVariable UUID timeSlotId
 	){
 		SearchTimeSlotResult result = timeSlotService.getTimeSlot(timeSlotId);
@@ -110,14 +112,14 @@ public class TimeSlotController {
 	}
 
 	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
-	@PutMapping("/{storeId}/timeslots/{timeslotId}")
+	@PutMapping("/timeslots/{timeslotId}")
 	public ApiResponse<UpdateTimeSlotResponse> updateTimeSlots(
-		@PathVariable UUID storeId,
 		@PathVariable UUID timeslotId,
-		@Valid @RequestBody UpdateTimeSlotRequest request
+		@Valid @RequestBody UpdateTimeSlotRequest request,
+		@CurrentUser UserContext user
 	){
 		UpdateTimeSlotCommand command = request.toCommand();
-		UpdateTimeSlotResult result = timeSlotService.updateTimeSlots(timeslotId, command);
+		UpdateTimeSlotResult result = timeSlotService.updateTimeSlots(timeslotId, command, user.getUserId(), user.getRoles());
 		UpdateTimeSlotResponse response = UpdateTimeSlotResponse.from(result);
 		return ApiResponse.of(SuccessCode.OK, response);
 	}
@@ -125,9 +127,10 @@ public class TimeSlotController {
 	@RoleCheck({UserRole.ADMIN, UserRole.STORE_MANAGER})
 	@DeleteMapping("/timeslots/{timeSlotId}")
 	public ApiResponse<String> deleteTimeSlot(
-		@PathVariable UUID timeSlotId
+		@PathVariable UUID timeSlotId,
+		@CurrentUser UserContext user
 	){
-		timeSlotService.deleteTimeSlot(timeSlotId);
+		timeSlotService.deleteTimeSlot(timeSlotId, user.getUserId(), user.getRoles());
 		return ApiResponse.of(SuccessCode.OK,"");
 	}
 }

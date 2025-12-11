@@ -14,6 +14,7 @@ import com.popjub.storeservice.application.dto.command.CreateStoreCommand;
 import com.popjub.storeservice.application.dto.command.CreateTimeRuleCommand;
 import com.popjub.storeservice.application.dto.command.UpdateStoreCommand;
 import com.popjub.storeservice.domain.entity.Category;
+import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.repository.CategoryRepository;
 import com.popjub.storeservice.exception.StoreCustomException;
 import com.popjub.storeservice.exception.StoreErrorCode;
@@ -25,6 +26,17 @@ import lombok.RequiredArgsConstructor;
 public class StoreValidator {
 
 	private final CategoryRepository categoryRepository;
+
+	public void validateManagerOrAdmin(Store store, Long currentUserId, List<String> roles) {
+		boolean isAdmin = roles.contains("ADMIN");
+		if(isAdmin){
+			return;
+		}
+		if (store.isNotManagedBy(currentUserId)) {
+			throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
+		}
+	}
+
 
 	public void validateCreateStore(
 		CreateStoreCommand storeCommand,
