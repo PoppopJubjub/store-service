@@ -1,5 +1,6 @@
 package com.popjub.storeservice.application.validation;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -35,5 +36,14 @@ public class TimeSlotValidator {
 	public void validateUpdateTimeSlot(TimeSlot timeSlot, Long currentUserId, List<String> role){
 		Store store = timeSlot.getStore();
 		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
+	}
+
+	public void validateCheckin(TimeSlot timeSlot, Store store){
+		if(timeSlot.doesNotBelongTo(store)){
+			throw new StoreCustomException(StoreErrorCode.INVALID_TIMESLOT_FOR_STORE);
+		}
+		if(timeSlot.isNotWithinCheckInWindow(LocalDateTime.now())){
+			throw new StoreCustomException(StoreErrorCode.CHECK_IN_TIME_EXPIRED);
+		}
 	}
 }

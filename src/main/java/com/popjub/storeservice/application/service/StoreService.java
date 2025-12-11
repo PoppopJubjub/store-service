@@ -20,6 +20,7 @@ import com.popjub.storeservice.application.dto.result.SearchStoreResult;
 import com.popjub.storeservice.application.dto.result.UpdateStoreResult;
 import com.popjub.storeservice.application.dto.result.UpdateStoreTimeResult;
 import com.popjub.storeservice.application.validation.StoreValidator;
+import com.popjub.storeservice.application.validation.TimeSlotValidator;
 import com.popjub.storeservice.domain.entity.Category;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.StoreCategory;
@@ -47,6 +48,7 @@ public class StoreService {
 	private final TimeSlotRepository timeSlotRepository;
 	private final StoreValidator storeValidator;
 	private final TimeSlotService timeSlotService;
+	private final TimeSlotValidator timeSlotValidator;
 
 	@Transactional
 	public CreateStoreResult createStore(
@@ -205,4 +207,25 @@ public class StoreService {
 		store.decreaseRating(command.rating());
 	}
 
+
+	public boolean validateCheckin(UUID storeId, UUID timeSlotId, Long currentUserId) {
+		try {
+			Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+
+			TimeSlot timeSlot = timeSlotRepository.findById(timeSlotId)
+				.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+
+			if(store.isNotManagedBy(currentUserId)){
+				throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
+			}
+			timeSlotValidator.validateCheckin(timeSlot, store);
+
+			return true;
+		}catch (StoreCustomException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 }
