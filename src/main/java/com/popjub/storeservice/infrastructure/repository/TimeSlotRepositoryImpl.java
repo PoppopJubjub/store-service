@@ -1,6 +1,7 @@
 package com.popjub.storeservice.infrastructure.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,5 +54,10 @@ public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 	@Override
 	public List<TimeSlot> findAllByStore(Store store) {
 		return timeSlotJpaRepository.findAllByStoreAndDeletedAtIsNull(store);
+	}
+
+	@Override
+	public List<UUID> closedUpdate(LocalDateTime now) {
+		return timeSlotJpaRepository.closeExpired(now);
 	}
 }
