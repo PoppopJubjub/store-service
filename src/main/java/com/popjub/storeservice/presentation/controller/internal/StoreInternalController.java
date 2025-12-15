@@ -65,6 +65,11 @@ public class StoreInternalController {
 		SearchTimeSlotInternalResult result = timeSlotService.getTimeSlotInternal(timeslotId);
 		return SearchTimeSlotInternalResponse.from(result);
 	}
+
+	@GetMapping("/{storeId}/exists")
+	public boolean existsStore(@PathVariable("storeId") UUID storeId){
+		return storeService.existsStore(storeId);
+	}
 	/**
 	 * consumer - 이벤트 받는 곳
 	 * review -> store kafka로 통신
