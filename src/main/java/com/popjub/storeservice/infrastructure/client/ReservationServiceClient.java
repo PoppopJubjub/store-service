@@ -17,4 +17,8 @@ public interface ReservationServiceClient {
 	Map<UUID, Integer> getRemaining(
 		@RequestBody List<UUID> timeslotIds
 	);
+
+	@PostMapping("/internal/reservations/timeslots/closed")
+	void sendClosedIds(@RequestBody List<UUID> timeslotIds);
+
 }
