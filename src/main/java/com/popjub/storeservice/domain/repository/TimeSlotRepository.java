@@ -1,6 +1,7 @@
 package com.popjub.storeservice.domain.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,4 +26,6 @@ public interface TimeSlotRepository {
 	void deleteAllByStoreAndDate(Store store, LocalDate date);
 
 	List<TimeSlot> findAllByStore(Store store);
+
+	List<UUID> closedUpdate(LocalDateTime now);
 }
