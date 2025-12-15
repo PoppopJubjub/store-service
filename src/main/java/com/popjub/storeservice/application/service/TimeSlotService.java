@@ -1,10 +1,12 @@
 package com.popjub.storeservice.application.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.popjub.storeservice.application.dto.result.GetRemainingResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotInternalResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.UpdateTimeSlotResult;
+import com.popjub.storeservice.application.event.TimeSlotCloseEvent;
 import com.popjub.storeservice.application.port.ReservationServicePort;
 import com.popjub.storeservice.application.validation.StoreValidator;
 import com.popjub.storeservice.application.validation.TimeSlotValidator;
@@ -42,6 +45,7 @@ public class TimeSlotService {
 	private final TimeSlotValidator timeSlotValidator;
 	private final StoreValidator storeValidator;
 	private final ReservationServicePort reservationServicePort;
+	private final ApplicationEventPublisher publisher;
 
 	@Transactional
 	public CreateTimeSlotResult createTimeslots(UUID storeId, CreateTimeSlotCommand command, Long currentUserId, List<String> role) {
@@ -158,5 +162,14 @@ public class TimeSlotService {
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
 
 		return  SearchTimeSlotInternalResult.from(timeSlot);
+	}
+
+	@Transactional
+	public void closeAndSend(LocalDateTime now){
+		List<UUID> closedIds = timeslotRepository.closedUpdate(now);
+		if(closedIds.isEmpty()){
+			return;
+		}
+		publisher.publishEvent(new TimeSlotCloseEvent(closedIds));
 	}
 }
