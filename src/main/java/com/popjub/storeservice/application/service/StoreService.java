@@ -228,4 +228,8 @@ public class StoreService {
 			return false;
 		}
 	}
+
+	public boolean existsStore(UUID storeId) {
+		return storeRepository.existsByStoreId(storeId);
+	}
 }

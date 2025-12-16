@@ -18,6 +18,11 @@ public class StoreRepositoryImpl implements StoreRepository {
 	private final StoreJpaRepository storeJpaRepository;
 
 	@Override
+	public boolean existsByStoreId(UUID storeId) {
+		return storeJpaRepository.existsById(storeId);
+	}
+
+	@Override
 	public Store save(Store store) {
 		return storeJpaRepository.save(store);
 	}
