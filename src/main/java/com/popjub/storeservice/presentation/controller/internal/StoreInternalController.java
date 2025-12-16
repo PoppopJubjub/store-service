@@ -66,6 +66,14 @@ public class StoreInternalController {
 		return SearchTimeSlotInternalResponse.from(result);
 	}
 
+	@PostMapping("/timeslot/update-status")
+	void updateTimeSlotStatus(
+		@RequestParam("timeslotId") UUID timeslotId,
+		@RequestParam("status") TimeSlotStatus status
+	){
+		timeSlotService.statusUpdate(timeslotId, status);
+	}
+
 	@GetMapping("/{storeId}/exists")
 	public boolean existsStore(@PathVariable("storeId") UUID storeId){
 		return storeService.existsStore(storeId);
