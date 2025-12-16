@@ -16,6 +16,7 @@ import com.popjub.storeservice.application.dto.command.UpdateRatingCommand;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotInternalResult;
 import com.popjub.storeservice.application.service.StoreService;
 import com.popjub.storeservice.application.service.TimeSlotService;
+import com.popjub.storeservice.domain.entity.TimeSlotStatus;
 import com.popjub.storeservice.presentation.dto.request.UpdateRatingRequest;
 import com.popjub.storeservice.presentation.dto.response.SearchTimeSlotInternalResponse;
 
