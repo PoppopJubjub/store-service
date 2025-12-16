@@ -32,6 +32,7 @@ public enum StoreErrorCode implements BaseErrorCode {
 	INVALID_TIME_RULE_DAYS("모든 요일(MONDAY~SUNDAY)의 운영시간이 필요합니다.", HttpStatus.BAD_REQUEST),
 	INVALID_TIMESLOT_FOR_STORE("타임슬롯에 해당하는 스토어가 아닙니다." , HttpStatus.BAD_REQUEST),
 	CHECK_IN_TIME_EXPIRED("체크인 가능 시간대가 아닙니다.", HttpStatus.BAD_REQUEST),
+	INVALID_TIMESLOT_STATUS("타임슬롯의 스테이터스가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 	INVALID_STORE_TIME_RANGE("운영 시작 시간이 종료 시간보다 같거나 늦을 수 없습니다.", HttpStatus.BAD_REQUEST);
 
 	private final String message;

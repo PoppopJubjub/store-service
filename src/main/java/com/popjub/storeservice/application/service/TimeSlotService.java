@@ -26,6 +26,7 @@ import com.popjub.storeservice.application.validation.TimeSlotValidator;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.StoreTime;
 import com.popjub.storeservice.domain.entity.TimeSlot;
+import com.popjub.storeservice.domain.entity.TimeSlotStatus;
 import com.popjub.storeservice.domain.repository.StoreRepository;
 import com.popjub.storeservice.domain.repository.StoreTimeRepository;
 import com.popjub.storeservice.domain.repository.TimeSlotRepository;
@@ -171,5 +172,23 @@ public class TimeSlotService {
 			return;
 		}
 		publisher.publishEvent(new TimeSlotCloseEvent(closedIds));
+	}
+
+	@Transactional
+	public void statusUpdate(UUID timeslotId, TimeSlotStatus status) {
+		TimeSlot timeSlot = timeslotRepository.findById(timeslotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		//FULL인데 FULL 요청이 들어오거나 CLOSED로 요청이 들어오면 그냥 리턴
+		if(status == timeSlot.getStatus()){
+			return;
+		}
+		if(timeSlot.getStatus() == TimeSlotStatus.CLOSED){
+			return;
+		}
+		switch (status) {
+			case FULL -> timeSlot.makeFull();
+			case AVAILABLE -> timeSlot.makeAvailable();
+			default -> throw new StoreCustomException(StoreErrorCode.INVALID_TIMESLOT_STATUS);
+		}
 	}
 }
