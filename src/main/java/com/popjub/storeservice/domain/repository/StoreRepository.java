@@ -1,5 +1,6 @@
 package com.popjub.storeservice.domain.repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ public interface StoreRepository{
 	Store save(Store store);
 	Optional<Store> findById(UUID storeId);
 	Page<Store> findAll(Pageable pageable);
+	int openStores(LocalDate today);
+	int closeStores(LocalDate today);
 }

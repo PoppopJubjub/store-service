@@ -232,4 +232,14 @@ public class StoreService {
 	public boolean existsStore(UUID storeId) {
 		return storeRepository.existsByStoreId(storeId);
 	}
+
+	@Transactional
+	public void openStores(LocalDate today) {
+		storeRepository.openStores(today);
+	}
+
+	@Transactional
+	public void closeStores(LocalDate today) {
+		storeRepository.closeStores(today);
+	}
 }

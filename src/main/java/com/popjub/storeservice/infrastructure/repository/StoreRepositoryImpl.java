@@ -1,5 +1,6 @@
 package com.popjub.storeservice.infrastructure.repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,5 +36,15 @@ public class StoreRepositoryImpl implements StoreRepository {
 	@Override
 	public Page<Store> findAll(Pageable pageable) {
 		return storeJpaRepository.findAllByDeletedAtIsNull(pageable);
+	}
+
+	@Override
+	public int openStores(LocalDate today) {
+		return storeJpaRepository.openStores(today);
+	}
+
+	@Override
+	public int closeStores(LocalDate today) {
+		return storeJpaRepository.closeStores(today);
 	}
 }
