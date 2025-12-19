@@ -30,7 +30,7 @@ public interface TimeSlotJpaRepository extends JpaRepository<TimeSlot, UUID> {
   with updated as(update p_timeslot t
      set status = 'CLOSED' 			-- AVAILABLE을 대상으로 종료된 타임슬롯을 CLOSED로 변경
    where status = 'AVAILABLE'
-     and (t.date + t.start_time + make_interval(mins => t.interval_minutes)) < :now --타임슬롯 종료 시간 계산 후 현재 시간과 비교
+     and (t.date + t.start_time + interval '20 minutes') < :now --타임슬롯 종료 시간 계산 후 현재 시간과 비교
   returning t.timeslot_id) select timeslot_id from updated
 """, nativeQuery = true) //JPQL이 아닌 nativeQuery
 	List<UUID> closeExpired(@Param("now") LocalDateTime now); //현재 시각 주입
