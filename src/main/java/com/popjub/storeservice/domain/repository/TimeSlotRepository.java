@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.popjub.storeservice.application.dto.query.TimeSlotRuleView;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.TimeSlot;
 
@@ -28,4 +29,6 @@ public interface TimeSlotRepository {
 	List<TimeSlot> findAllByStore(Store store);
 
 	List<UUID> closedUpdate(LocalDateTime now);
+
+	List<TimeSlotRuleView> findRuleByStoreAndDate(Store store, LocalDate date, Pageable pageable);
 }

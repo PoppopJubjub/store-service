@@ -8,12 +8,14 @@ import java.util.UUID;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popjub.storeservice.application.dto.command.CreateTimeSlotCommand;
 import com.popjub.storeservice.application.dto.command.UpdateTimeSlotCommand;
+import com.popjub.storeservice.application.dto.query.TimeSlotRuleView;
 import com.popjub.storeservice.application.dto.result.CreateTimeSlotResult;
 import com.popjub.storeservice.application.dto.result.GetRemainingResult;
 import com.popjub.storeservice.application.dto.result.SearchTimeSlotInternalResult;
@@ -67,8 +69,7 @@ public class TimeSlotService {
 	}
 
 	public SearchTimeSlotResult getTimeSlot(UUID timeSlotId){
-		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		TimeSlot timeSlot = getTimeSlotId(timeSlotId);
 		return SearchTimeSlotResult.from(timeSlot);
 	}
 
@@ -77,6 +78,7 @@ public class TimeSlotService {
 		return timeSlotPage.map(SearchTimeSlotResult::from);
 	}
 
+	//todo : feign통신 과정에서 조회 성능 낮아짐
 	public Page<GetRemainingResult> getStoreTimeSlots(UUID storeId, LocalDate date, Pageable pageable){
 		Page<TimeSlot> timeSlotByStorePage = timeslotRepository.findAllByStore_StoreIdAndDate(storeId, date, pageable);
 
@@ -104,16 +106,11 @@ public class TimeSlotService {
 	@Transactional
 	public void RegenerateTimeSlots(Store store, LocalDate date){
 		List<TimeSlot> existing = timeslotRepository.findAllByStoreAndDate(store, date);
-		
 		if(existing.isEmpty()){
 			throw new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT);
 		}
 
-		//TimeSlot의 interval과 capacity 가져오기
-		TimeSlot baseSlot = existing.get(0);
-		Integer interval = baseSlot.getInterval();
-		Integer capacity = baseSlot.getCapacity();
-		
+		TimeSlotRuleView rule = findRule(store, date);
 		//기존 타임슬롯 제거
 		timeslotRepository.deleteAllByStoreAndDate(store, date);
 
@@ -124,8 +121,8 @@ public class TimeSlotService {
 		//운영시간 기준으로 새 타임슬롯 생성
 		CreateTimeSlotCommand command = new CreateTimeSlotCommand(
 			date,
-			interval,
-			capacity
+			rule.interval(),
+			rule.capacity()
 		);
 
 		List<TimeSlot> newTimeSlots = command.createTimeslots(store, storeTime);
@@ -134,8 +131,7 @@ public class TimeSlotService {
 
 	@Transactional
 	public UpdateTimeSlotResult updateTimeSlots(UUID timeSlotId, UpdateTimeSlotCommand command, Long currentUserId, List<String> role) {
-		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		TimeSlot timeSlot = getTimeSlotId(timeSlotId);
 		//상태 변경
 		timeSlotValidator.validateUpdateTimeSlot(timeSlot, currentUserId, role);
 
@@ -150,8 +146,7 @@ public class TimeSlotService {
 
 	@Transactional
 	public void deleteTimeSlot(UUID timeSlotId, Long currentUserId, List<String> role) {
-		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		TimeSlot timeSlot = getTimeSlotId(timeSlotId);
 
 		timeSlotValidator.validateUpdateTimeSlot(timeSlot, currentUserId, role);
 
@@ -159,8 +154,7 @@ public class TimeSlotService {
 	}
 
 	public SearchTimeSlotInternalResult getTimeSlotInternal(UUID timeSlotId){
-		TimeSlot timeSlot = timeslotRepository.findById(timeSlotId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		TimeSlot timeSlot = getTimeSlotId(timeSlotId);
 
 		return  SearchTimeSlotInternalResult.from(timeSlot);
 	}
@@ -176,8 +170,7 @@ public class TimeSlotService {
 
 	@Transactional
 	public void statusUpdate(UUID timeslotId, TimeSlotStatus status) {
-		TimeSlot timeSlot = timeslotRepository.findById(timeslotId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+		TimeSlot timeSlot = getTimeSlotId(timeslotId);
 		//FULL인데 FULL 요청이 들어오거나 CLOSED로 요청이 들어오면 그냥 리턴
 		if(status == timeSlot.getStatus()){
 			return;
@@ -191,4 +184,19 @@ public class TimeSlotService {
 			default -> throw new StoreCustomException(StoreErrorCode.INVALID_TIMESLOT_STATUS);
 		}
 	}
+
+	private TimeSlotRuleView findRule(Store store, LocalDate date){
+		List<TimeSlotRuleView> rules = timeslotRepository.findRuleByStoreAndDate(store, date, PageRequest.of(0,1));
+		if(rules.isEmpty()){
+			throw new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT);
+		}
+		return rules.stream().findFirst().orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+	}
+
+
+	private TimeSlot getTimeSlotId(UUID timeSlotId) {
+		return timeslotRepository.findById(timeSlotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
+	}
+
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.popjub.storeservice.application.dto.query.TimeSlotRuleView;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.TimeSlot;
 import com.popjub.storeservice.domain.repository.TimeSlotRepository;
@@ -59,5 +60,11 @@ public class TimeSlotRepositoryImpl implements TimeSlotRepository {
 	@Override
 	public List<UUID> closedUpdate(LocalDateTime now) {
 		return timeSlotJpaRepository.closeExpired(now);
+	}
+
+
+	@Override
+	public List<TimeSlotRuleView> findRuleByStoreAndDate(Store store, LocalDate date, Pageable pageable) {
+		return timeSlotJpaRepository.findRuleByStoreAndDate(store, date, pageable);
 	}
 }
