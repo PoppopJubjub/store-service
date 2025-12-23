@@ -96,17 +96,15 @@ public class StoreService {
 	}
 
 	public SearchStoreResult searchStoreDetail(UUID storeId) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
-		List<String> categories = storeCategoryRepository.findCategoryNamesByStore(store);
-		List<StoreTime> storeTimes = storeTimeRepository.findAllByStore(store);
+		Store store = getStore(storeId);
+		List<String> categories = storeCategoryRepository.findCategoryNamesByStoreId(storeId);
+		List<StoreTime> storeTimes = storeTimeRepository.findAllByStoreId(storeId);
 		return SearchStoreResult.from(store, categories, storeTimes);
 	}
 
 	@Transactional
 	public UpdateStoreResult updateStore(UUID storeId, UpdateStoreCommand command, Long currentUserId, List<String> role) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		Store store = getStore(storeId);
 
 		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
@@ -130,10 +128,8 @@ public class StoreService {
 
 	@Transactional
 	public UpdateStoreTimeResult updateStoreTime(UUID storeId, LocalDate date, UpdateStoreTimeCommand command, Long currentUserId, List<String> role) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
-		StoreTime storeTime = storeTimeRepository.findByStoreAndDate(store, date)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
+		Store store = getStore(storeId);
+		StoreTime storeTime = getStoreTime(store, date);
 
 		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 
@@ -154,11 +150,9 @@ public class StoreService {
 
 	@Transactional
 	public void deleteStoreCategory(UUID storeId, Long CategoryId, Long currentUserId, List<String> role) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		Store store = getStore(storeId);
 
-		Category category = categoryRepository.findById(CategoryId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+		Category category = getCategory(CategoryId);
 
 		StoreCategory storeCategory = storeCategoryRepository.findByStoreAndCategory(store, category)
 			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
@@ -171,8 +165,7 @@ public class StoreService {
 	@Transactional
 	public void deleteStore(UUID storeId, Long currentUserId, List<String> role) {
 
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		Store store = getStore(storeId);
 
 		storeValidator.validateManagerOrAdmin(store, currentUserId, role);
 		// 연관 StoreTime, Timeslot , storeCategory 조회해서 softDelete
@@ -196,26 +189,20 @@ public class StoreService {
 
 	@Transactional
 	public void increaseRating(UpdateRatingCommand command) {
-		Store store = storeRepository.findById(command.storeId())
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		Store store = getStore(command.storeId());
 		store.increaseRating(command.rating());
 	}
 	@Transactional
 	public void decreaseRating(UpdateRatingCommand command) {
-		Store store = storeRepository.findById(command.storeId())
-			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+		Store store = getStore(command.storeId());
 		store.decreaseRating(command.rating());
 	}
 
 
 	public boolean validateCheckin(UUID storeId, UUID timeSlotId, Long currentUserId) {
 		try {
-			Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
-
-			TimeSlot timeSlot = timeSlotRepository.findById(timeSlotId)
-				.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
-
+			Store store = getStore(storeId);
+			TimeSlot timeSlot = getTimeSlot(timeSlotId);
 			if(store.isNotManagedBy(currentUserId)){
 				throw new StoreCustomException(StoreErrorCode.FORBIDDEN_STORE_ACCESS);
 			}
@@ -241,5 +228,25 @@ public class StoreService {
 	@Transactional
 	public void closeStores(LocalDate today) {
 		storeRepository.closeStores(today);
+	}
+
+	private Store getStore(UUID storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE));
+	}
+
+	private Category getCategory(Long categoryId) {
+		return categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_CATEGORY));
+	}
+
+	private StoreTime getStoreTime(Store store, LocalDate date) {
+		return storeTimeRepository.findByStoreAndDate(store, date)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_STORE_TIME));
+	}
+
+	private TimeSlot getTimeSlot(UUID timeSlotId) {
+		return timeSlotRepository.findById(timeSlotId)
+			.orElseThrow(() -> new StoreCustomException(StoreErrorCode.NOT_FOUND_TIME_SLOT));
 	}
 }

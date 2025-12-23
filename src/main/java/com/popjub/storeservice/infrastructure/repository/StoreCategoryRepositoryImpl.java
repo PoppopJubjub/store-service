@@ -2,6 +2,7 @@ package com.popjub.storeservice.infrastructure.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -40,5 +41,10 @@ public class StoreCategoryRepositoryImpl implements StoreCategoryRepository {
 	@Override
 	public List<StoreCategory> findAllByStore(Store store) {
 		return storeCategoryJpaRepository.findAllByStoreAndDeletedAtIsNull(store);
+	}
+
+	@Override
+	public List<String> findCategoryNamesByStoreId(UUID storeId) {
+		return storeCategoryJpaRepository.findCategoryNamesByStoreId(storeId);
 	}
 }

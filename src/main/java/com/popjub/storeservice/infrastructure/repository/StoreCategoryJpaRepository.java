@@ -2,6 +2,7 @@ package com.popjub.storeservice.infrastructure.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,13 @@ public interface StoreCategoryJpaRepository extends JpaRepository<StoreCategory,
 	Optional<StoreCategory> findByStoreAndCategoryAndDeletedAtIsNull(Store store, Category category);
 
 	List<StoreCategory> findAllByStoreAndDeletedAtIsNull(Store store);
+
+	@Query("""
+	select c.categoryName
+	from StoreCategory sc
+	join sc.category c
+	where sc.store.storeId = :storeId
+	and sc.deletedAt is null
+""")
+	List<String> findCategoryNamesByStoreId(UUID storeId);
 }
