@@ -3,6 +3,7 @@ package com.popjub.storeservice.infrastructure.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
@@ -27,6 +28,11 @@ public class StoreTimeRepositoryImpl implements StoreTimeRepository {
 	@Override
 	public List<StoreTime> findAllByStore(Store store) {
 		return storeTimeJpaRepository.findAllByStore(store);
+	}
+
+	@Override
+	public List<StoreTime> findAllByStoreId(UUID storeId) {
+		return storeTimeJpaRepository.findAllByStoreId(storeId);
 	}
 
 	@Override

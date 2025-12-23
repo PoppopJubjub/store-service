@@ -2,6 +2,7 @@ package com.popjub.storeservice.domain.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.popjub.storeservice.domain.entity.Category;
 import com.popjub.storeservice.domain.entity.Store;
@@ -18,4 +19,5 @@ public interface StoreCategoryRepository{
 
 	List<StoreCategory> findAllByStore(Store store);
 
+	List<String> findCategoryNamesByStoreId(UUID storeId);
 }

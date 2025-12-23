@@ -37,6 +37,15 @@ public class StoreValidator {
 		}
 	}
 
+	public void validateCategoryNameDuplication(Category category, String categoryName) {
+		if(isSameCategoryName(category, categoryName)) {
+			return;
+		}
+		if(categoryRepository.existsByName(categoryName)) {
+			throw new StoreCustomException(StoreErrorCode.ALREADY_EXISTS_CATEGORY);
+		}
+	}
+
 
 	public void validateCreateStore(
 		CreateStoreCommand storeCommand,
@@ -125,5 +134,10 @@ public class StoreValidator {
 		if (!days.containsAll(required)) {
 			throw new StoreCustomException(StoreErrorCode.INVALID_TIME_RULE_DAYS);
 		}
+	}
+
+
+	private boolean isSameCategoryName(Category category, String newCategoryName) {
+		return category.getCategoryName().equals(newCategoryName);
 	}
 }

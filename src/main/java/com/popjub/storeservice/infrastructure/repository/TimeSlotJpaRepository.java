@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.popjub.storeservice.application.dto.query.TimeSlotRuleView;
 import com.popjub.storeservice.domain.entity.Store;
 import com.popjub.storeservice.domain.entity.TimeSlot;
 
@@ -34,4 +35,15 @@ public interface TimeSlotJpaRepository extends JpaRepository<TimeSlot, UUID> {
   returning t.timeslot_id) select timeslot_id from updated
 """, nativeQuery = true) //JPQL이 아닌 nativeQuery
 	List<UUID> closeExpired(@Param("now") LocalDateTime now); //현재 시각 주입
+
+
+	@Query("""
+	select new com.popjub.storeservice.application.dto.query.TimeSlotRuleView(ts.interval, ts.capacity)
+	from TimeSlot ts
+	where ts.store = :store
+	and ts.date = :date
+	and ts.deletedAt is null
+	order by ts.startTime asc
+""")
+	List<TimeSlotRuleView> findRuleByStoreAndDate(Store store, LocalDate date, Pageable pageable);
 }

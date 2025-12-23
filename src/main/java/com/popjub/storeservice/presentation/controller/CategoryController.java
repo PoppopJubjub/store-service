@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.popjub.common.annotation.CurrentUser;
 import com.popjub.common.annotation.RoleCheck;
 import com.popjub.common.enums.SuccessCode;
 import com.popjub.common.enums.UserRole;
@@ -89,9 +90,10 @@ public class CategoryController {
 	@RoleCheck(UserRole.ADMIN)
 	@DeleteMapping("/{categoryId}")
 	public ApiResponse<String> deleteCategory(
-		@PathVariable Long categoryId
+		@PathVariable Long categoryId,
+		@CurrentUser Long userId
 	){
-		categoryService.deleteCategory(categoryId);
+		categoryService.deleteCategory(categoryId, userId);
 		return ApiResponse.of(SuccessCode.OK, "");
 	}
 }
