@@ -18,7 +18,6 @@ public class StoreScheduler {
 
 	private final StoreService storeService;
 
-	@Transactional
 	@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
 	/*@Scheduled(fixedDelay = 10_000, initialDelay = 1_000) //테스트용*/
 	public void updateStoreStatus(){

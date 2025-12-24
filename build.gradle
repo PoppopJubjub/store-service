@@ -31,10 +31,6 @@ ext {
 }
 
 dependencies {
-
-    // ----------------------------------------------------
-    // 1. common 모듈 의존성 추가 (common 모듈의 라이브러리 자동 포함)
-    // ----------------------------------------------------
     implementation 'com.github.PoppopJubjub:common:1.1.4'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -50,6 +46,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
